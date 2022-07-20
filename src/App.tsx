@@ -1,25 +1,57 @@
 import React from 'react';
+import {
+  Box,
+  Container,
+  Grid,
+  Paper,
+  Tabs,
+  Tab,
+} from '@material-ui/core';
 import logo from './logo.svg';
 import './App.css';
 
+import { ItemCard } from './layout';
+
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <Container maxWidth="lg">
+      <Paper square>
+        <Tabs
+          value={0}
+          indicatorColor="primary"
+          textColor="primary"
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          <Tab label="Cômodos" />
+          <Tab label="Cortes" />
+        </Tabs>
+      </Paper>
+
+      <Box style={{ marginTop: 16, marginLeft: 16 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6} md={4} lg={2}>
+            <ItemCard />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={2}>
+            <ItemCard />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={2}>
+            <ItemCard />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={2}>
+            <ItemCard />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={2}>
+            <ItemCard />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={2}>
+            <ItemCard />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={2}>
+            <ItemCard />
+          </Grid>
+        </Grid>
+      </Box>
+    </Container>
   );
 }
 
