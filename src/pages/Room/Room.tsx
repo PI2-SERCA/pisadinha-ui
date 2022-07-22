@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import {
   Step,
   Button,
@@ -10,6 +10,9 @@ import {
 import { CeramicMeasures as CeramicMeasuresStep } from './steps/CeramicMeasures';
 
 import useStyles from './room-styles';
+import { RoomMeasures } from './steps/RoomMeasures';
+
+const steps = ['Medidas cerâmica', 'Medidas cômodo', 'Revisão'];
 
 export const Room: React.FC = () => {
   const classes = useStyles();
@@ -20,8 +23,6 @@ export const Room: React.FC = () => {
   const [ceramicWidth, setCeramicWidth] = useState<number | null>(null);
   const [ceramicHeight, setCeramicHeight] = useState<number | null>(null);
   const [fieldsErrors, setFieldsErrors] = useState<Record<string, string>>({});
-
-  const steps = ['Medidas cerâmica', 'Medidas cômodo', 'Revisão'];
 
   const validateCeramicMeasuresStep = () => {
     const newFieldsErrors: Record<string, string> = {};
@@ -42,21 +43,21 @@ export const Room: React.FC = () => {
     2: () => true,
   };
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (!stepValidations[activeStep]()) return;
 
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
+  }, []);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     stepValidations[activeStep]();
-  };
+  }, []);
 
-  const getStepContent = (step: number): JSX.Element => {
+  const getStepContent = useCallback((step: number): JSX.Element => {
     switch (step) {
       case 0:
         return (
@@ -73,13 +74,13 @@ export const Room: React.FC = () => {
           />
         );
       case 1:
-        return <div>What is an ad group anyways?</div>;
+        return <RoomMeasures />;
       case 2:
         return <div>This is the bit I really care about!</div>;
       default:
         return <div>Unknown step</div>;
     }
-  };
+  }, []);
 
   return (
     <Container className={classes.container}>
