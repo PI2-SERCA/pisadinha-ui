@@ -7,7 +7,6 @@ import {
   Tabs,
   Tab,
 } from '@material-ui/core';
-import logo from './logo.svg';
 import './App.css';
 
 import { ItemCard } from './layout';
