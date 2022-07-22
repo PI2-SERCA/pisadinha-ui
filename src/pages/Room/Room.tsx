@@ -4,6 +4,7 @@ import {
   Button,
   Stepper,
   StepLabel,
+  Container,
 } from '@material-ui/core';
 
 import { CeramicMeasures as CeramicMeasuresStep } from './steps/CeramicMeasures';
@@ -81,40 +82,42 @@ export const Room: React.FC = () => {
   };
 
   return (
-    <div className={classes.root}>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
+    <Container className={classes.container}>
+      <div className={classes.root}>
+        <Stepper activeStep={activeStep}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
 
-      <div>
-        <div className={classes.instructions}>
-          {getStepContent(activeStep)}
-        </div>
+        <div>
+          <div className={classes.instructions}>
+            {getStepContent(activeStep)}
+          </div>
 
-        <div className={classes.actionBtnsContainer}>
-          <Button
-            color="secondary"
-            variant="contained"
-            disabled={activeStep === 0}
-            onClick={handleBack}
-          >
-            Voltar
-          </Button>
+          <div className={classes.actionBtnsContainer}>
+            <Button
+              color="secondary"
+              variant="contained"
+              disabled={activeStep === 0}
+              onClick={handleBack}
+            >
+              Voltar
+            </Button>
 
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}
-          >
-            {activeStep === steps.length - 1 ? 'Enviar' : 'Próximo'}
-          </Button>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}
+            >
+              {activeStep === steps.length - 1 ? 'Enviar' : 'Próximo'}
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
 
