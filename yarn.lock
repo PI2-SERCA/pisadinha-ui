@@ -6026,6 +6026,11 @@ klona@^2.0.4, klona@^2.0.5:
   resolved "https://registry.yarnpkg.com/klona/-/klona-2.0.5.tgz#d166574d90076395d9963aa7a928fabb8d76afbc"
   integrity sha512-pJiBpiXMbt7dkzXe8Ghj/u4FfXOOa98fPW+bihOJ4SjnoijweJrNThJfd3ifXpXhREjpoF2mZVH1GfS9LV3kHQ==
 
+konva@^8.3.10:
+  version "8.3.10"
+  resolved "https://registry.yarnpkg.com/konva/-/konva-8.3.10.tgz#66e93815878c2d48f1b6076d5a06b18ec4eb3217"
+  integrity sha512-5zOynjWBG9wWgpA634SDH+764eyoISpmHLTOCfQ3GFN8OBVd83Genk6H0R4D3hXV0kEGIFAv7RDcSVDtQpPOMw==
+
 language-subtag-registry@~0.3.2:
   version "0.3.22"
   resolved "https://registry.yarnpkg.com/language-subtag-registry/-/language-subtag-registry-0.3.22.tgz#2e1500861b2e457eba7e7ae86877cbd08fa1fd1d"
@@ -7537,12 +7542,28 @@ react-is@^18.0.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
 
+react-konva@^18.2.1:
+  version "18.2.1"
+  resolved "https://registry.yarnpkg.com/react-konva/-/react-konva-18.2.1.tgz#389cd55c3fc4d18616f8564e0bfc098c473da78c"
+  integrity sha512-JqNMqxAMg1JC8GLs+ZtPoXMVPzQw6XQCxxiFpw01A5HVoglTJQk6Ih+VO2DUD+VAh8ic7GVNE7YeeW+IexBg7g==
+  dependencies:
+    react-reconciler "~0.29.0"
+    scheduler "^0.23.0"
+
 react-number-format@^4.9.3:
   version "4.9.3"
   resolved "https://registry.yarnpkg.com/react-number-format/-/react-number-format-4.9.3.tgz#338500fe9c61b1ac73c8d6dff4ec97dd13fd2b50"
   integrity sha512-am1A1xYAbENuKJ+zpM7V+B1oRTSeOHYltqVKExznIVFweBzhLmOBmyb1DfIKjHo90E0bo1p3nzVJ2NgS5xh+sQ==
   dependencies:
     prop-types "^15.7.2"
+
+react-reconciler@~0.29.0:
+  version "0.29.0"
+  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.29.0.tgz#ee769bd362915076753f3845822f2d1046603de7"
+  integrity sha512-wa0fGj7Zht1EYMRhKWwoo1H9GApxYLBuhoAuXN0TlltESAjDssB+Apf0T/DngVqaMyPypDmabL37vw/2aRM98Q==
+  dependencies:
+    loose-envify "^1.1.0"
+    scheduler "^0.23.0"
 
 react-refresh@^0.11.0:
   version "0.11.0"

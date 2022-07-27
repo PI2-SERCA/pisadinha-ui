@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, memo } from 'react';
+import React, { useRef } from 'react';
+import { Stage, Layer, Shape } from 'react-konva';
+
 // import { TextField } from '@material-ui/core';
 
 // import NumberFormatCustom from '../../../../components/NumberInputField';
@@ -46,8 +48,6 @@ export const RoomMeasures: React.FC = () => {
   const classes = useStyles();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  console.log('teste');
-
   const drawCanvasLine = (srcCoord: Coordinate, destCoord: Coordinate): void => {
     const canvas = canvasRef?.current;
 
@@ -65,40 +65,46 @@ export const RoomMeasures: React.FC = () => {
     context.stroke();
   };
 
-  useEffect(() => {
-    const canvas = canvasRef?.current;
+  const getCanvasWidth = () => (window.screen.availWidth > 900 ? 900 : window.screen.availWidth);
 
-    if (!canvas) return;
+  const getCanvasHeight = () => (window.screen.availHeight > 500 ? 500 : window.screen.availHeight);
 
-    const context = canvas.getContext('2d');
+  const drawShape = (context: any, shape: any) => {
+    context.beginPath();
 
-    if (!context) return;
+    context.translate(LINE_WIDTH, LINE_WIDTH);
 
-    context.translate(canvas.width / 2, canvas.height / 2);
-
-    for (let i = 0; i < requestResponse.points.length; i++) {
+    for (let i = 0; i < requestResponse.points.length; i += 1) {
       const { length } = requestResponse.points;
 
       const [a, b] = requestResponse.points[i].split(';');
       const [c, d] = requestResponse.points[(i + 1) % length].split(';');
 
-      drawCanvasLine(
-        {
-          x: applyValues(requestResponse.defaults, a) * 10,
-          y: applyValues(requestResponse.defaults, b) * 10,
-        },
-        {
-          x: applyValues(requestResponse.defaults, c) * 10,
-          y: applyValues(requestResponse.defaults, d) * 10,
-        },
-      );
+      const startX = applyValues(requestResponse.defaults, a) * 50;
+      const startY = applyValues(requestResponse.defaults, b) * 50;
+
+      const endX = applyValues(requestResponse.defaults, c) * 50;
+      const endY = applyValues(requestResponse.defaults, d) * 50;
+
+      context.moveTo(startX, startY);
+      context.lineTo(endX, endY);
     }
-  }, []);
+
+    context.closePath();
+
+    context.fillStrokeShape(shape);
+  };
 
   return (
-    <div className={classes.root}>
-      <canvas ref={canvasRef} className={classes.canvas} />
-    </div>
+    <Stage width={getCanvasWidth()} height={getCanvasHeight()}>
+      <Layer>
+        <Shape
+          sceneFunc={drawShape}
+          stroke="black"
+          strokeWidth={LINE_WIDTH}
+        />
+      </Layer>
+    </Stage>
   );
 };
 
