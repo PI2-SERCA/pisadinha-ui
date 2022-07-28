@@ -6,15 +6,15 @@ import NumberFormatCustom from '../../../../components/NumberInputField';
 import useStyles from './ceramic-measures-styles';
 
 interface CeramicMeasuresProps {
-  spacing: number | null,
-  setSpacing: Dispatch<number | null>,
-  ceramicDepth: number | null,
-  setCeramicDepth: Dispatch<number | null>,
-  ceramicWidth: number | null,
-  setCeramicWidth: Dispatch<number | null>,
-  ceramicHeight: number | null,
-  setCeramicHeight: Dispatch<number | null>,
-  fieldsErrors: Record<string, string>,
+  spacing: number | null;
+  setSpacing: Dispatch<number | null>;
+  ceramicDepth: number | null;
+  setCeramicDepth: Dispatch<number | null>;
+  ceramicWidth: number | null;
+  setCeramicWidth: Dispatch<number | null>;
+  ceramicHeight: number | null;
+  setCeramicHeight: Dispatch<number | null>;
+  fieldsErrors: Record<string, string>;
 }
 
 export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({

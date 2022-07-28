@@ -9,7 +9,10 @@ interface NumberFormatProps {
 }
 
 const NumberInputField: React.FC<NumberFormatProps> = ({
-  inputRef, onChange, name, ...other
+  inputRef,
+  onChange,
+  name,
+  ...other
 }) => (
   <NumberFormat
     // eslint-disable-next-line react/jsx-props-no-spreading

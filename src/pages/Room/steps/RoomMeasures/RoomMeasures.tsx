@@ -1,78 +1,46 @@
-import React, { useRef } from 'react';
-import { Stage, Layer, Shape } from 'react-konva';
+import React, { SetStateAction, Dispatch } from 'react';
+import { Stage, Layer, Shape, Text, Label, Tag } from 'react-konva';
 
-// import { TextField } from '@material-ui/core';
+import Konva from 'konva/lib/index-types';
 
-// import NumberFormatCustom from '../../../../components/NumberInputField';
+import { TextField, Box, Typography } from '@material-ui/core';
+
+import NumberFormatCustom from '../../../../components/NumberInputField';
 
 import useStyles from './room-measures-styles';
 
-interface Coordinate {
-  x: number;
-  y: number;
-}
+import { RequestResponse } from '../../../../types';
 
 interface RoomMeasuresProps {
-  activeStep: number;
+  requestResponse: RequestResponse;
+  roomMeasures: Record<string, number>;
+  roomMeasuresErrors: Record<string, string>;
+  setRoomMeasures: Dispatch<SetStateAction<Record<string, number>>>;
 }
 
 const LINE_WIDTH = 5;
 
-interface RequestResponse {
-  name: string;
-  points: string[];
-  defaults: Record<string, number>;
-  segments: Record<string, string[]>;
-}
+const applyValues = (values: Record<string, number>, key: string) =>
+  values[key] || Number(key);
 
-const requestResponse: RequestResponse = {
-  points: ['0;0', '0;a', 'b;a', 'b;c', 'd;c', 'd;0'],
-  defaults: {
-    a: 4,
-    b: 2,
-    c: 7,
-    d: 5,
-  },
-  segments: {
-    a: ['0;0', '0;a'],
-    b: ['0;a', 'b;a'],
-    c: ['d;c', 'd;0'],
-    d: ['0;0', 'd;0'],
-  },
-  name: 'Formato em L',
-};
+const parseStrToFloat = (str: string) => parseFloat(str.replace(',', '.'));
 
-const applyValues = (values: Record<string, number>, key: string) => values[key] || Number(key);
-
-export const RoomMeasures: React.FC = () => {
+export const RoomMeasures: React.FC<RoomMeasuresProps> = ({
+  roomMeasures,
+  setRoomMeasures,
+  requestResponse,
+  roomMeasuresErrors,
+}) => {
   const classes = useStyles();
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const drawCanvasLine = (srcCoord: Coordinate, destCoord: Coordinate): void => {
-    const canvas = canvasRef?.current;
+  const getCanvasWidth = () =>
+    window.screen.availWidth > 900 ? 900 : window.screen.availWidth;
 
-    if (!canvas) return;
+  const getCanvasHeight = () =>
+    window.screen.availHeight > 500 ? 500 : window.screen.availHeight;
 
-    const context = canvas.getContext('2d');
-
-    if (!context) return;
-
+  const drawShape = (context: Konva.Context, shape: Konva.Shape) => {
     context.beginPath();
-    context.strokeStyle = '#000000';
-    context.lineWidth = LINE_WIDTH;
-    context.moveTo(srcCoord.x, srcCoord.y);
-    context.lineTo(destCoord.x, destCoord.y);
-    context.stroke();
-  };
-
-  const getCanvasWidth = () => (window.screen.availWidth > 900 ? 900 : window.screen.availWidth);
-
-  const getCanvasHeight = () => (window.screen.availHeight > 500 ? 500 : window.screen.availHeight);
-
-  const drawShape = (context: any, shape: any) => {
-    context.beginPath();
-
-    context.translate(LINE_WIDTH, LINE_WIDTH);
 
     for (let i = 0; i < requestResponse.points.length; i += 1) {
       const { length } = requestResponse.points;
@@ -95,16 +63,66 @@ export const RoomMeasures: React.FC = () => {
     context.fillStrokeShape(shape);
   };
 
+  const drawTexts = () =>
+    Object.entries(requestResponse.segments).map(([key, value]) => {
+      const [x1, y1] = value[0]
+        .split(';')
+        .map((v) => applyValues(requestResponse.defaults, v) * 50);
+      const [x2, y2] = value[1]
+        .split(';')
+        .map((v) => applyValues(requestResponse.defaults, v) * 50);
+
+      const midx = (x1 + x2) / 2 - 10;
+      const midy = (y1 + y2) / 2 - 13;
+
+      return (
+        <Label key={key} x={midx} y={midy}>
+          <Tag fill="white" stroke="black" />
+          <Text text={key.toUpperCase()} fontSize={18} padding={4} />
+        </Label>
+      );
+    });
+
   return (
-    <Stage width={getCanvasWidth()} height={getCanvasHeight()}>
-      <Layer>
-        <Shape
-          sceneFunc={drawShape}
-          stroke="black"
-          strokeWidth={LINE_WIDTH}
-        />
-      </Layer>
-    </Stage>
+    <>
+      <Stage width={getCanvasWidth()} height={getCanvasHeight()}>
+        <Layer offsetX={-LINE_WIDTH - 10} offsetY={-LINE_WIDTH - 13}>
+          <Shape
+            sceneFunc={drawShape}
+            stroke="black"
+            strokeWidth={LINE_WIDTH}
+          />
+
+          {drawTexts()}
+        </Layer>
+      </Stage>
+
+      <Typography variant="body1">Insira as medidas correspondentes</Typography>
+
+      <Box className={classes.inputBox}>
+        {Object.keys(requestResponse.segments).map((key) => (
+          <TextField
+            key={key}
+            required
+            label={key.toUpperCase()}
+            placeholder="Tamanho em metros"
+            style={{ marginBottom: '24px' }}
+            value={roomMeasures[key]}
+            error={!!roomMeasuresErrors[key]}
+            helperText={roomMeasuresErrors[key]}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setRoomMeasures((prev) => ({
+                ...prev,
+                [key]: parseStrToFloat(e.target.value),
+              }));
+            }}
+            InputProps={{
+              inputComponent: NumberFormatCustom as React.FC,
+            }}
+          />
+        ))}
+      </Box>
+    </>
   );
 };
 
