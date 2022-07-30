@@ -46,7 +46,7 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
             setSpacing(parseStrToFloat(e.target.value));
           }}
           InputProps={{
-            inputComponent: NumberFormatCustom as any,
+            inputComponent: NumberFormatCustom as React.FC,
           }}
         />
       </div>
@@ -67,7 +67,7 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
               setCeramicDepth(parseStrToFloat(e.target.value));
             }}
             InputProps={{
-              inputComponent: NumberFormatCustom as any,
+              inputComponent: NumberFormatCustom as React.FC,
             }}
           />
         </div>
@@ -90,7 +90,7 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
                 setCeramicHeight(parseStrToFloat(e.target.value));
               }}
               InputProps={{
-                inputComponent: NumberFormatCustom as any,
+                inputComponent: NumberFormatCustom as React.FC,
               }}
             />
           </div>
@@ -107,7 +107,7 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
                 setCeramicWidth(parseStrToFloat(e.target.value));
               }}
               InputProps={{
-                inputComponent: NumberFormatCustom as any,
+                inputComponent: NumberFormatCustom as React.FC,
               }}
             />
           </div>
