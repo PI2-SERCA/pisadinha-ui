@@ -17,6 +17,9 @@ const useStyles = makeStyles(() =>
       cursor: 'pointer',
       alignItems: 'center',
       justifyContent: 'space-between',
+      '&:hover': {
+        opacity: 0.75,
+      },
     },
     cardContent: {
       width: '100%',
