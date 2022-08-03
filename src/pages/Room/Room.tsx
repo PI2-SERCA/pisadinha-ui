@@ -1,12 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import { Step, Button, Stepper, StepLabel, Container } from '@material-ui/core';
 
+import { Checkout } from './steps/Checkout';
+import { RoomMeasures } from './steps/RoomMeasures';
 import { CeramicMeasures as CeramicMeasuresStep } from './steps/CeramicMeasures';
 
-import useStyles from './room-styles';
-import { RoomMeasures } from './steps/RoomMeasures';
-
 import { RequestResponse } from '../../types';
+
+import useStyles from './room-styles';
 
 const steps = ['Medidas cerâmica', 'Medidas cômodo', 'Revisão'];
 
@@ -122,7 +123,7 @@ export const Room: React.FC = () => {
             />
           );
         case 2:
-          return <div>This is the bit I really care about!</div>;
+          return <Checkout requestResponse={requestResponse} />;
         default:
           return <div>Unknown step</div>;
       }
