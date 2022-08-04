@@ -5,6 +5,7 @@ import Konva from 'konva/lib/index-types';
 
 import { TextField, Box, Typography } from '@material-ui/core';
 
+import { parseStrToFloat } from '../../../../utils/number';
 import NumberFormatCustom from '../../../../components/NumberInputField';
 
 import useStyles from './room-measures-styles';
@@ -22,8 +23,6 @@ const LINE_WIDTH = 5;
 
 const applyValues = (values: Record<string, number>, key: string) =>
   values[key] || Number(key);
-
-const parseStrToFloat = (str: string) => parseFloat(str.replace(',', '.'));
 
 export const RoomMeasures: React.FC<RoomMeasuresProps> = ({
   roomMeasures,

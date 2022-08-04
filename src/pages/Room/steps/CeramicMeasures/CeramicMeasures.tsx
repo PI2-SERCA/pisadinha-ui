@@ -1,6 +1,7 @@
 import React, { Dispatch } from 'react';
 import { TextField } from '@material-ui/core';
 
+import { parseStrToFloat } from '../../../../utils/number';
 import NumberFormatCustom from '../../../../components/NumberInputField';
 
 import useStyles from './ceramic-measures-styles';
@@ -29,8 +30,6 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
   fieldsErrors,
 }) => {
   const classes = useStyles();
-
-  const parseStrToFloat = (str: string) => parseFloat(str.replace(',', '.'));
 
   return (
     <>
