@@ -1,11 +1,18 @@
 import React, { SetStateAction, Dispatch } from 'react';
-import { Stage, Layer, Shape, Text, Label, Tag } from 'react-konva';
+import { Stage, Layer, Shape } from 'react-konva';
 
 import Konva from 'konva/lib/index-types';
 
 import { TextField, Box, Typography } from '@material-ui/core';
 
 import { parseStrToFloat } from '../../../../utils/number';
+import {
+  LINE_WIDTH,
+  applyValues,
+  drawTexts,
+  getCanvasWidth,
+  getCanvasHeight,
+} from '../../../../utils/canvas';
 import NumberFormatCustom from '../../../../components/NumberInputField';
 
 import useStyles from './room-measures-styles';
@@ -19,11 +26,6 @@ interface RoomMeasuresProps {
   setRoomMeasures: Dispatch<SetStateAction<Record<string, number>>>;
 }
 
-const LINE_WIDTH = 5;
-
-const applyValues = (values: Record<string, number>, key: string) =>
-  values[key] || Number(key);
-
 export const RoomMeasures: React.FC<RoomMeasuresProps> = ({
   roomMeasures,
   setRoomMeasures,
@@ -31,12 +33,6 @@ export const RoomMeasures: React.FC<RoomMeasuresProps> = ({
   roomMeasuresErrors,
 }) => {
   const classes = useStyles();
-
-  const getCanvasWidth = () =>
-    window.screen.availWidth > 900 ? 900 : window.screen.availWidth;
-
-  const getCanvasHeight = () =>
-    window.screen.availHeight > 500 ? 500 : window.screen.availHeight;
 
   const drawShape = (context: Konva.Context, shape: Konva.Shape) => {
     context.beginPath();
@@ -62,26 +58,6 @@ export const RoomMeasures: React.FC<RoomMeasuresProps> = ({
     context.fillStrokeShape(shape);
   };
 
-  const drawTexts = () =>
-    Object.entries(requestResponse.segments).map(([key, value]) => {
-      const [x1, y1] = value[0]
-        .split(';')
-        .map((v) => applyValues(requestResponse.defaults, v) * 50);
-      const [x2, y2] = value[1]
-        .split(';')
-        .map((v) => applyValues(requestResponse.defaults, v) * 50);
-
-      const midx = (x1 + x2) / 2 - 10;
-      const midy = (y1 + y2) / 2 - 13;
-
-      return (
-        <Label key={key} x={midx} y={midy}>
-          <Tag fill="white" stroke="black" />
-          <Text text={key.toUpperCase()} fontSize={18} padding={4} />
-        </Label>
-      );
-    });
-
   return (
     <>
       <Stage width={getCanvasWidth()} height={getCanvasHeight()}>
@@ -92,7 +68,7 @@ export const RoomMeasures: React.FC<RoomMeasuresProps> = ({
             strokeWidth={LINE_WIDTH}
           />
 
-          {drawTexts()}
+          {drawTexts(requestResponse.segments, requestResponse.defaults)}
         </Layer>
       </Stage>
 

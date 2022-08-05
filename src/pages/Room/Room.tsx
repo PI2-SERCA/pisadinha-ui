@@ -3,13 +3,19 @@ import { Step, Button, Stepper, StepLabel, Container } from '@material-ui/core';
 
 import { Checkout } from './steps/Checkout';
 import { RoomMeasures } from './steps/RoomMeasures';
+import { LayingStart } from './steps/LayingStart';
 import { CeramicMeasures as CeramicMeasuresStep } from './steps/CeramicMeasures';
 
 import { RequestResponse } from '../../types';
 
 import useStyles from './room-styles';
 
-const steps = ['Medidas cerâmica', 'Medidas cômodo', 'Revisão'];
+const steps = [
+  'Medidas cerâmica',
+  'Medidas cômodo',
+  'Início assentamento',
+  'Revisão',
+];
 
 const requestResponse: RequestResponse = {
   points: ['0;0', '0;a', 'b;a', 'b;c', 'd;c', 'd;0'],
@@ -43,6 +49,7 @@ export const Room: React.FC = () => {
   const [roomMeasuresErrors, setRoomMeasuresErrors] = useState<
     Record<string, string>
   >({});
+  const [selectedLayingStart, setSelectedLayingStart] = useState('');
 
   const validateCeramicMeasuresStep = useCallback(() => {
     const newFieldsErrors: Record<string, string> = {};
@@ -123,7 +130,15 @@ export const Room: React.FC = () => {
             />
           );
         case 2:
-          return <Checkout requestResponse={requestResponse} />;
+          return (
+            <LayingStart
+              requestResponse={requestResponse}
+              selectedLayingStart={selectedLayingStart}
+              setSelectedLayingStart={setSelectedLayingStart}
+            />
+          );
+        case 3:
+          return <Checkout />;
         default:
           return <div>Unknown step</div>;
       }
@@ -136,6 +151,8 @@ export const Room: React.FC = () => {
       fieldsErrors,
       roomMeasures,
       roomMeasuresErrors,
+      selectedLayingStart,
+      setSelectedLayingStart,
     ]
   );
 

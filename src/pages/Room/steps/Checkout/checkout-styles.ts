@@ -28,10 +28,6 @@ const useStyles = makeStyles(() =>
       alignItems: 'center',
       justifyContent: 'space-between',
     },
-    xIcon: {
-      width: 32,
-      height: 32,
-    },
     cutImage: {
       maxWidth: 240,
       maxHeight: 120,

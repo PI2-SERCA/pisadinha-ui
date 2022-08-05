@@ -8,11 +8,9 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import { Close } from '@material-ui/icons';
 
 import useStyles from './checkout-styles';
 
-import { RequestResponse } from '../../../../types';
 import { base64ToUrl } from '../../../../utils/image';
 
 interface SettlementItem {
@@ -21,16 +19,12 @@ interface SettlementItem {
   cutImage: string;
 }
 
-interface CheckoutProps {
-  requestResponse: RequestResponse;
-}
-
-export const Checkout: React.FC<CheckoutProps> = ({ requestResponse }) => {
+export const Checkout: React.FC = () => {
   const classes = useStyles();
 
   const [roomRepetitions, setRoomRepetitions] = useState(1);
   const [notSelected, setNotSelected] = useState<Record<string, boolean>>({});
-  const [settlementData, setSettlementData] = useState<SettlementItem[]>(
+  const [settlementData] = useState<SettlementItem[]>(
     new Array(5)
       .fill({
         id: 'irineu',
@@ -60,7 +54,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ requestResponse }) => {
       />
 
       <Box className={classes.cutList}>
-        {settlementData.map(({ id, repeat, cutImage }, idx) => (
+        {settlementData.map(({ id, repeat, cutImage }) => (
           <Card
             key={id}
             className={classes.card}
@@ -82,7 +76,9 @@ export const Checkout: React.FC<CheckoutProps> = ({ requestResponse }) => {
                 {repeat}
               </Typography>
 
-              <Close className={classes.xIcon} />
+              <Typography variant="h4" component="h2">
+                &times;
+              </Typography>
 
               <CardMedia
                 component="img"
