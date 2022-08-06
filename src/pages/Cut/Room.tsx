@@ -2,9 +2,9 @@ import React, { useState, useCallback } from 'react';
 import { Step, Button, Stepper, StepLabel, Container } from '@material-ui/core';
 
 import { Checkout } from './steps/Checkout';
+import { RoomMeasures } from './steps/RoomMeasures';
 import { LayingStart } from './steps/LayingStart';
-import { CastMeasures as RoomMeasures } from '../../components/CastMeasures';
-import { CeramicMeasures as CeramicMeasuresStep } from '../../components/CeramicMeasures';
+import { CeramicMeasures as CeramicMeasuresStep } from './steps/CeramicMeasures';
 
 import { RequestResponse } from '../../types';
 
@@ -124,9 +124,9 @@ export const Room: React.FC = () => {
           return (
             <RoomMeasures
               requestResponse={requestResponse}
-              castMeasuresErrors={roomMeasuresErrors}
-              castMeasures={roomMeasures}
-              setCastMeasures={setRoomMeasures}
+              roomMeasuresErrors={roomMeasuresErrors}
+              roomMeasures={roomMeasures}
+              setRoomMeasures={setRoomMeasures}
             />
           );
         case 2:
