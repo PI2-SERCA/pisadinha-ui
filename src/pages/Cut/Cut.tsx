@@ -2,41 +2,50 @@ import React, { useState, useCallback } from 'react';
 import { Step, Button, Stepper, StepLabel, Container } from '@material-ui/core';
 
 import { Checkout } from './steps/Checkout';
-import { RoomMeasures } from './steps/RoomMeasures';
-import { LayingStart } from './steps/LayingStart';
-import { CeramicMeasures as CeramicMeasuresStep } from './steps/CeramicMeasures';
+import { CeramicMeasures } from '../../components/CeramicMeasures';
+import { CastMeasures as CutMeasures } from '../../components/CastMeasures';
 
-import { RequestResponse } from '../../types';
+import { Cast } from '../../types';
 
-import useStyles from './room-styles';
+import useStyles from './cut-styles';
 
-const steps = [
-  'Medidas cerâmica',
-  'Medidas cômodo',
-  'Início assentamento',
-  'Revisão',
-];
+const steps = ['Medidas cerâmica', 'Medidas corte', 'Revisão'];
 
-const requestResponse: RequestResponse = {
-  points: ['0;0', '0;a', 'b;a', 'b;c', 'd;c', 'd;0'],
+// const requestResponse: Cast = {
+//   points: ['0;0', '0;a', 'b;a', 'b;c', 'd;c', 'd;0'],
+//   defaults: {
+//     a: 4,
+//     b: 2,
+//     c: 7,
+//     d: 5,
+//   },
+//   segments: {
+//     a: ['0;0', '0;a'],
+//     b: ['0;a', 'b;a'],
+//     c: ['d;c', 'd;0'],
+//     d: ['0;0', 'd;0'],
+//   },
+//   name: 'Formato em L',
+// };
+
+const requestResponse: Cast = {
+  points: ['0;0', 'a;0', 'a;b', '0;b', '0;0'],
   defaults: {
-    a: 4,
-    b: 2,
-    c: 7,
-    d: 5,
+    a: 6,
+    b: 6,
+    c: 6,
+    d: 6,
   },
   segments: {
-    a: ['0;0', '0;a'],
-    b: ['0;a', 'b;a'],
-    c: ['d;c', 'd;0'],
-    d: ['0;0', 'd;0'],
+    a: ['0;0', 'a;0'],
+    b: ['a;b', '0;b'],
+    c: ['0;b', '0;0'],
+    d: ['0;0', '0;0'],
   },
   name: 'Formato em L',
 };
 
-// TODO: Descer os botões e passar callbacks de onCancel e onSubmit e cada step controla
-// seu estado interno
-export const Room: React.FC = () => {
+export const Cut: React.FC = () => {
   const classes = useStyles();
 
   const [activeStep, setActiveStep] = useState(0);
@@ -45,11 +54,14 @@ export const Room: React.FC = () => {
   const [ceramicWidth, setCeramicWidth] = useState<number | null>(null);
   const [ceramicHeight, setCeramicHeight] = useState<number | null>(null);
   const [fieldsErrors, setFieldsErrors] = useState<Record<string, string>>({});
-  const [roomMeasures, setRoomMeasures] = useState<Record<string, number>>({});
-  const [roomMeasuresErrors, setRoomMeasuresErrors] = useState<
+  const [cutMeasures, setCutMeasures] = useState<Record<string, number>>({});
+  const [cutMeasuresErrors, setCutMeasuresErrors] = useState<
     Record<string, string>
   >({});
-  const [selectedLayingStart, setSelectedLayingStart] = useState('');
+  const [cutPosition, setCutPosition] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
 
   const validateCeramicMeasuresStep = useCallback(() => {
     const newFieldsErrors: Record<string, string> = {};
@@ -65,29 +77,29 @@ export const Room: React.FC = () => {
     return Object.keys(newFieldsErrors).length === 0;
   }, [spacing, ceramicDepth, ceramicWidth, ceramicHeight, setFieldsErrors]);
 
-  const validateRoomMeasuresStep = useCallback(() => {
+  const validateCutMeasuresStep = useCallback(() => {
     const newFieldsErrors: Record<string, string> = {};
 
     Object.keys(requestResponse.segments).forEach((key) => {
-      if (!roomMeasures[key]) {
+      if (!cutMeasures[key]) {
         newFieldsErrors[key] = `${key.toUpperCase()} é obrigatório`;
       }
     });
 
-    setRoomMeasuresErrors(newFieldsErrors);
+    setCutMeasuresErrors(newFieldsErrors);
 
     return Object.keys(newFieldsErrors).length === 0;
-  }, [roomMeasures, setRoomMeasuresErrors]);
+  }, [cutMeasures, setCutMeasuresErrors]);
 
   const validateStep = useCallback(() => {
     if (activeStep === 0) return validateCeramicMeasuresStep();
 
-    if (activeStep === 1) return validateRoomMeasuresStep();
+    if (activeStep === 1) return validateCutMeasuresStep();
 
     if (activeStep === 2) return true;
 
     return false;
-  }, [activeStep, validateCeramicMeasuresStep, validateRoomMeasuresStep]);
+  }, [activeStep, validateCeramicMeasuresStep, validateCutMeasuresStep]);
 
   const handleNext = useCallback(() => {
     if (!validateStep()) return;
@@ -108,7 +120,7 @@ export const Room: React.FC = () => {
       switch (step) {
         case 0:
           return (
-            <CeramicMeasuresStep
+            <CeramicMeasures
               spacing={spacing}
               setSpacing={setSpacing}
               ceramicDepth={ceramicDepth}
@@ -122,23 +134,23 @@ export const Room: React.FC = () => {
           );
         case 1:
           return (
-            <RoomMeasures
+            <CutMeasures
               requestResponse={requestResponse}
-              roomMeasuresErrors={roomMeasuresErrors}
-              roomMeasures={roomMeasures}
-              setRoomMeasures={setRoomMeasures}
+              castMeasuresErrors={cutMeasuresErrors}
+              castMeasures={cutMeasures}
+              setCastMeasures={setCutMeasures}
             />
           );
         case 2:
           return (
-            <LayingStart
+            <Checkout
               requestResponse={requestResponse}
-              selectedLayingStart={selectedLayingStart}
-              setSelectedLayingStart={setSelectedLayingStart}
+              cutPosition={cutPosition}
+              setCutPosition={setCutPosition}
+              ceramicWidth={ceramicWidth as number}
+              ceramicHeight={ceramicHeight as number}
             />
           );
-        case 3:
-          return <Checkout />;
         default:
           return <div>Unknown step</div>;
       }
@@ -149,10 +161,10 @@ export const Room: React.FC = () => {
       ceramicWidth,
       ceramicHeight,
       fieldsErrors,
-      roomMeasures,
-      roomMeasuresErrors,
-      selectedLayingStart,
-      setSelectedLayingStart,
+      cutMeasures,
+      cutMeasuresErrors,
+      cutPosition,
+      setCutPosition,
     ]
   );
 
@@ -198,4 +210,4 @@ export const Room: React.FC = () => {
   );
 };
 
-export default Room;
+export default Cut;

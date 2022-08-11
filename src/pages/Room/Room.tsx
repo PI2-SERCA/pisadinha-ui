@@ -6,7 +6,7 @@ import { LayingStart } from './steps/LayingStart';
 import { CastMeasures as RoomMeasures } from '../../components/CastMeasures';
 import { CeramicMeasures as CeramicMeasuresStep } from '../../components/CeramicMeasures';
 
-import { RequestResponse } from '../../types';
+import { Cast } from '../../types';
 
 import useStyles from './room-styles';
 
@@ -17,7 +17,7 @@ const steps = [
   'Revisão',
 ];
 
-const requestResponse: RequestResponse = {
+const requestResponse: Cast = {
   points: ['0;0', '0;a', 'b;a', 'b;c', 'd;c', 'd;0'],
   defaults: {
     a: 4,

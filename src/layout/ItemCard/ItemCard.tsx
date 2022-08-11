@@ -12,7 +12,7 @@ const useStyles = makeStyles({
   },
 });
 
-export const ItemCard: React.FC = () => {
+export const ItemCard: React.FC<{ type: 'room' | 'cut' }> = ({ type }) => {
   const classes = useStyles();
 
   return (
@@ -27,7 +27,7 @@ export const ItemCard: React.FC = () => {
         />
         <CardContent>
           <Typography gutterBottom variant="h6" component="h2">
-            Cômodo XPTO
+            {type === 'room' ? 'Cômodo' : 'Corte'} XPTO
           </Typography>
         </CardContent>
       </CardActionArea>

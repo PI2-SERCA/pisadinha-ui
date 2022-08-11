@@ -25,7 +25,7 @@ export const Checkout: React.FC = () => {
   const [roomRepetitions, setRoomRepetitions] = useState(1);
   const [notSelected, setNotSelected] = useState<Record<string, boolean>>({});
   const [settlementData] = useState<SettlementItem[]>(
-    new Array(5)
+    new Array(3)
       .fill({
         id: 'irineu',
         repeat: 7,

@@ -15,19 +15,19 @@ import {
 } from '@material-ui/core';
 
 import {
-  drawTexts,
   LINE_WIDTH,
-  applyValues,
+  drawTexts,
+  drawShape,
   getCanvasWidth,
   getCanvasHeight,
 } from '../../../../utils/canvas';
 
 import useStyles from './laying-start-styles';
 
-import { RequestResponse } from '../../../../types';
+import { Cast } from '../../../../types';
 
 interface LayingStartProps {
-  requestResponse: RequestResponse;
+  requestResponse: Cast;
   selectedLayingStart: string;
   setSelectedLayingStart: Dispatch<string>;
 }
@@ -94,30 +94,6 @@ export const LayingStart: React.FC<LayingStartProps> = ({
   const [loading, setLoading] = useState(false);
   const [positionData, setPositionData] = useState<PositionData>(State);
 
-  const drawShape = (context: Konva.Context, shape: Konva.Shape) => {
-    context.beginPath();
-
-    for (let i = 0; i < requestResponse.points.length; i += 1) {
-      const { length } = requestResponse.points;
-
-      const [a, b] = requestResponse.points[i].split(';');
-      const [c, d] = requestResponse.points[(i + 1) % length].split(';');
-
-      const startX = applyValues(requestResponse.defaults, a) * 50;
-      const startY = applyValues(requestResponse.defaults, b) * 50;
-
-      const endX = applyValues(requestResponse.defaults, c) * 50;
-      const endY = applyValues(requestResponse.defaults, d) * 50;
-
-      context.moveTo(startX, startY);
-      context.lineTo(endX, endY);
-    }
-
-    context.closePath();
-
-    context.fillStrokeShape(shape);
-  };
-
   const handleStartChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const key = e.target.value as string;
 
@@ -137,12 +113,14 @@ export const LayingStart: React.FC<LayingStartProps> = ({
 
   return (
     <>
-      <Stage width={getCanvasWidth()} height={getCanvasHeight()}>
+      <Stage width={getCanvasWidth()} height={getCanvasHeight(400)}>
         <Layer offsetX={-LINE_WIDTH - 10} offsetY={-LINE_WIDTH - 13}>
           <Shape
-            sceneFunc={drawShape}
             stroke="black"
             strokeWidth={LINE_WIDTH}
+            sceneFunc={(context: Konva.Context, shape: Konva.Shape) =>
+              drawShape(context, shape, requestResponse)
+            }
           />
 
           {drawTexts(corners.segments)}
