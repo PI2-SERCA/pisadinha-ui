@@ -50,6 +50,7 @@ export const Room: React.FC = () => {
     Record<string, string>
   >({});
   const [selectedLayingStart, setSelectedLayingStart] = useState('');
+  const [layingStartValid, setLayingStartValid] = useState(true);
 
   const validateCeramicMeasuresStep = useCallback(() => {
     const newFieldsErrors: Record<string, string> = {};
@@ -79,15 +80,28 @@ export const Room: React.FC = () => {
     return Object.keys(newFieldsErrors).length === 0;
   }, [roomMeasures, setRoomMeasuresErrors]);
 
+  const validateLayingStartStep = useCallback(() => {
+    setLayingStartValid(!!selectedLayingStart);
+
+    return !!selectedLayingStart;
+  }, [selectedLayingStart, setLayingStartValid]);
+
   const validateStep = useCallback(() => {
     if (activeStep === 0) return validateCeramicMeasuresStep();
 
     if (activeStep === 1) return validateRoomMeasuresStep();
 
-    if (activeStep === 2) return true;
+    if (activeStep === 2) return validateLayingStartStep();
+
+    if (activeStep === 3) return true;
 
     return false;
-  }, [activeStep, validateCeramicMeasuresStep, validateRoomMeasuresStep]);
+  }, [
+    activeStep,
+    validateCeramicMeasuresStep,
+    validateRoomMeasuresStep,
+    validateLayingStartStep,
+  ]);
 
   const handleNext = useCallback(() => {
     if (!validateStep()) return;
@@ -133,6 +147,7 @@ export const Room: React.FC = () => {
           return (
             <LayingStart
               requestResponse={requestResponse}
+              layingStartValid={layingStartValid}
               selectedLayingStart={selectedLayingStart}
               setSelectedLayingStart={setSelectedLayingStart}
             />
@@ -153,6 +168,7 @@ export const Room: React.FC = () => {
       roomMeasuresErrors,
       selectedLayingStart,
       setSelectedLayingStart,
+      layingStartValid,
     ]
   );
 

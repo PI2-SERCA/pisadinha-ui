@@ -11,6 +11,7 @@ import {
   InputLabel,
   Typography,
   FormControl,
+  FormHelperText,
   CircularProgress,
 } from '@material-ui/core';
 
@@ -28,6 +29,7 @@ import { Cast } from '../../../../types';
 
 interface LayingStartProps {
   requestResponse: Cast;
+  layingStartValid: boolean;
   selectedLayingStart: string;
   setSelectedLayingStart: Dispatch<string>;
 }
@@ -86,6 +88,7 @@ function calculateAllCuts(uniqueCuts: [[any[], number]]): number {
 
 export const LayingStart: React.FC<LayingStartProps> = ({
   requestResponse,
+  layingStartValid,
   selectedLayingStart,
   setSelectedLayingStart,
 }) => {
@@ -132,7 +135,7 @@ export const LayingStart: React.FC<LayingStartProps> = ({
       </Typography>
 
       <Box className={classes.inputBox}>
-        <FormControl>
+        <FormControl error={!layingStartValid}>
           <InputLabel id="select-helper-label">Início</InputLabel>
 
           <Select
@@ -147,6 +150,10 @@ export const LayingStart: React.FC<LayingStartProps> = ({
               </MenuItem>
             ))}
           </Select>
+
+          {!layingStartValid && (
+            <FormHelperText>Local de início é obrigatório</FormHelperText>
+          )}
         </FormControl>
 
         {loading ? (
