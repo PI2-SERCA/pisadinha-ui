@@ -136,7 +136,7 @@ export const LayingStart: React.FC<LayingStartProps> = ({
 
       <Box className={classes.inputBox}>
         <FormControl error={!layingStartValid}>
-          <InputLabel id="select-helper-label">Início</InputLabel>
+          <InputLabel id="select-helper-label">Início *</InputLabel>
 
           <Select
             value={selectedLayingStart}

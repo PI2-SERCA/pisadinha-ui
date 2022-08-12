@@ -1,4 +1,4 @@
-import React, { useState, Dispatch, SetStateAction, useEffect } from 'react';
+import React, { useState, Dispatch, SetStateAction } from 'react';
 
 import { Box, TextField } from '@material-ui/core';
 
@@ -7,7 +7,6 @@ import { Stage, Layer, Shape, Rect } from 'react-konva';
 import {
   LINE_WIDTH,
   drawShape,
-  applyValues,
   getCanvasWidth,
   getCanvasHeight,
   MEASURE_PROPORTION,
@@ -36,10 +35,6 @@ export const Checkout: React.FC<CheckoutProps> = ({
 
   const [cutRepetitions, setCutRepetitions] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [maxCoordinateValues, setMaxCoordinateValues] = useState({
-    x: 0,
-    y: 0,
-  });
 
   const changePosition = (axis: 'x' | 'y', value: string) => {
     let errorMsg = '';
@@ -59,25 +54,6 @@ export const Checkout: React.FC<CheckoutProps> = ({
       [axis]: errorMsg,
     }));
   };
-
-  useEffect(() => {
-    let maxY = 0;
-    let maxX = 0;
-
-    requestResponse.points.forEach((point) => {
-      const [strX, strY] = point.split(';');
-      let [x, y] = [Number(strX), Number(strY)];
-
-      x = Number.isNaN(x) ? applyValues(requestResponse.defaults, strX) : x;
-      y = Number.isNaN(y) ? applyValues(requestResponse.defaults, strY) : y;
-
-      if (x > maxX) maxX = x;
-
-      if (y > maxY) maxY = y;
-    });
-
-    setMaxCoordinateValues({ x: maxY, y: maxX });
-  }, [requestResponse]);
 
   return (
     <>

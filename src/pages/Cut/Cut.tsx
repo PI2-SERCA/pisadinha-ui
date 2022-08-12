@@ -31,10 +31,10 @@ const steps = ['Medidas cerâmica', 'Medidas corte', 'Revisão'];
 const requestResponse: Cast = {
   points: ['0;0', 'a;0', 'a;b', '0;b', '0;0'],
   defaults: {
-    a: 6,
-    b: 6,
-    c: 6,
-    d: 6,
+    a: 2,
+    b: 2,
+    c: 2,
+    d: 2,
   },
   segments: {
     a: ['0;0', 'a;0'],
