@@ -137,6 +137,7 @@ export const Room: React.FC = () => {
         case 1:
           return (
             <RoomMeasures
+              measure="m"
               requestResponse={requestResponse}
               castMeasuresErrors={roomMeasuresErrors}
               castMeasures={roomMeasures}

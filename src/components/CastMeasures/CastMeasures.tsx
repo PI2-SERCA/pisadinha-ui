@@ -12,6 +12,7 @@ import {
   drawTexts,
   getCanvasWidth,
   getCanvasHeight,
+  MEASURE_PROPORTION,
 } from '../../utils/canvas';
 import NumberFormatCustom from '../NumberInputField';
 
@@ -20,14 +21,20 @@ import useStyles from './cast-measures-styles';
 import { Cast } from '../../types';
 
 interface CastMeasuresProps {
+  measure: 'cm' | 'm';
+  proportion?: number;
   requestResponse: Cast;
+  maxCanvasHeight?: number;
   castMeasures: Record<string, number>;
   castMeasuresErrors: Record<string, string>;
   setCastMeasures: Dispatch<SetStateAction<Record<string, number>>>;
 }
 
 export const CastMeasures: React.FC<CastMeasuresProps> = ({
+  measure,
+  proportion,
   castMeasures,
+  maxCanvasHeight,
   setCastMeasures,
   requestResponse,
   castMeasuresErrors,
@@ -36,17 +43,21 @@ export const CastMeasures: React.FC<CastMeasuresProps> = ({
 
   return (
     <>
-      <Stage width={getCanvasWidth()} height={getCanvasHeight()}>
+      <Stage width={getCanvasWidth()} height={getCanvasHeight(maxCanvasHeight)}>
         <Layer offsetX={-LINE_WIDTH - 10} offsetY={-LINE_WIDTH - 13}>
           <Shape
             stroke="black"
             strokeWidth={LINE_WIDTH}
             sceneFunc={(context: Konva.Context, shape: Konva.Shape) =>
-              drawShape(context, shape, requestResponse)
+              drawShape(context, shape, requestResponse, proportion)
             }
           />
 
-          {drawTexts(requestResponse.segments, requestResponse.defaults)}
+          {drawTexts(
+            requestResponse.segments,
+            requestResponse.defaults,
+            proportion
+          )}
         </Layer>
       </Stage>
 
@@ -57,8 +68,10 @@ export const CastMeasures: React.FC<CastMeasuresProps> = ({
           <TextField
             key={key}
             required
-            label={key.toUpperCase()}
-            placeholder="Tamanho em metros"
+            label={`${key.toUpperCase()} (${measure})`}
+            placeholder={`Tamanho em ${
+              measure === 'm' ? 'metros' : 'centímetros'
+            }`}
             style={{ marginBottom: '24px' }}
             value={castMeasures[key]}
             error={!!castMeasuresErrors[key]}
@@ -77,6 +90,11 @@ export const CastMeasures: React.FC<CastMeasuresProps> = ({
       </Box>
     </>
   );
+};
+
+CastMeasures.defaultProps = {
+  maxCanvasHeight: 900,
+  proportion: MEASURE_PROPORTION,
 };
 
 export default CastMeasures;

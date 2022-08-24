@@ -1,4 +1,4 @@
-import React, { useState, Dispatch, SetStateAction } from 'react';
+import React, { useState } from 'react';
 
 import { Box, TextField } from '@material-ui/core';
 
@@ -9,7 +9,6 @@ import {
   drawShape,
   getCanvasWidth,
   getCanvasHeight,
-  MEASURE_PROPORTION,
 } from '../../../../utils/canvas';
 
 import useStyles from './checkout-styles';
@@ -18,42 +17,20 @@ import { Cast } from '../../../../types';
 
 interface CheckoutProps {
   requestResponse: Cast;
-  cutPosition: { x: number; y: number };
-  setCutPosition: Dispatch<SetStateAction<{ x: number; y: number }>>;
   ceramicWidth: number;
   ceramicHeight: number;
 }
 
+const MEASURE_PROPORTION = 10;
+
 export const Checkout: React.FC<CheckoutProps> = ({
   requestResponse,
-  cutPosition,
-  setCutPosition,
   ceramicWidth,
   ceramicHeight,
 }) => {
   const classes = useStyles();
 
   const [cutRepetitions, setCutRepetitions] = useState(1);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const changePosition = (axis: 'x' | 'y', value: string) => {
-    let errorMsg = '';
-    const newValue = parseInt(value, 10);
-
-    if (newValue > (axis === 'x' ? ceramicWidth : ceramicHeight)) {
-      errorMsg = 'O valor não pode ultrapassar o tamanho da cerâmica';
-    } else {
-      setCutPosition((prev) => ({
-        ...prev,
-        [axis]: Number.isNaN(newValue) ? '' : newValue,
-      }));
-    }
-
-    setErrors((prev) => ({
-      ...prev,
-      [axis]: errorMsg,
-    }));
-  };
 
   return (
     <>
@@ -69,38 +46,10 @@ export const Checkout: React.FC<CheckoutProps> = ({
             setCutRepetitions(parseInt(e.target.value, 10))
           }
         />
-
-        <TextField
-          type="number"
-          variant="outlined"
-          value={cutPosition.x}
-          label="Posicionamento corte X"
-          error={!!errors.x}
-          helperText={errors.x}
-          InputLabelProps={{ shrink: true }}
-          style={{ minWidth: 150, marginLeft: 16 }}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            changePosition('x', e.target.value)
-          }
-        />
-
-        <TextField
-          type="number"
-          variant="outlined"
-          value={cutPosition.y}
-          label="Posicionamento corte Y"
-          error={!!errors.y}
-          helperText={errors.y}
-          InputLabelProps={{ shrink: true }}
-          style={{ minWidth: 150, marginLeft: 16 }}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            changePosition('y', e.target.value)
-          }
-        />
       </Box>
 
       <Box className={classes.cutList}>
-        <Stage width={getCanvasWidth()} height={getCanvasHeight(350)}>
+        <Stage width={getCanvasWidth()} height={getCanvasHeight(530)}>
           <Layer offsetX={-LINE_WIDTH - 10} offsetY={-LINE_WIDTH - 13}>
             <Rect
               x={0}
@@ -113,15 +62,12 @@ export const Checkout: React.FC<CheckoutProps> = ({
             />
           </Layer>
 
-          <Layer
-            offsetX={-LINE_WIDTH - 10 - cutPosition.x * MEASURE_PROPORTION}
-            offsetY={-LINE_WIDTH - 13 - cutPosition.y * MEASURE_PROPORTION}
-          >
+          <Layer>
             <Shape
               stroke="red"
               strokeWidth={LINE_WIDTH}
               sceneFunc={(context: Konva.Context, shape: Konva.Shape) =>
-                drawShape(context, shape, requestResponse)
+                drawShape(context, shape, requestResponse, 10, true)
               }
             />
           </Layer>

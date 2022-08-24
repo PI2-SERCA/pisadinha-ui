@@ -9,40 +9,17 @@ import { Cast } from '../../types';
 
 import useStyles from './cut-styles';
 
-const steps = ['Medidas cerâmica', 'Medidas corte', 'Revisão'];
-
-// const requestResponse: Cast = {
-//   points: ['0;0', '0;a', 'b;a', 'b;c', 'd;c', 'd;0'],
-//   defaults: {
-//     a: 4,
-//     b: 2,
-//     c: 7,
-//     d: 5,
-//   },
-//   segments: {
-//     a: ['0;0', '0;a'],
-//     b: ['0;a', 'b;a'],
-//     c: ['d;c', 'd;0'],
-//     d: ['0;0', 'd;0'],
-//   },
-//   name: 'Formato em L',
-// };
+const steps = ['Medidas cerâmica', 'Medidas corte', 'Preview'];
 
 const requestResponse: Cast = {
-  points: ['0;0', 'a;0', 'a;b', '0;b', '0;0'],
+  points: ['0;0', 'a;0', 'a;a', '0;a', '0;0'],
   defaults: {
-    a: 2,
-    b: 2,
-    c: 2,
-    d: 2,
+    a: 20,
   },
   segments: {
     a: ['0;0', 'a;0'],
-    b: ['a;b', '0;b'],
-    c: ['0;b', '0;0'],
-    d: ['0;0', '0;0'],
   },
-  name: 'Formato em L',
+  name: 'Corte Quadrado',
 };
 
 export const Cut: React.FC = () => {
@@ -58,10 +35,12 @@ export const Cut: React.FC = () => {
   const [cutMeasuresErrors, setCutMeasuresErrors] = useState<
     Record<string, string>
   >({});
-  const [cutPosition, setCutPosition] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  });
+
+  const cutMaxMeasure = () => {
+    const values = Object.values(requestResponse.defaults);
+
+    return values.sort()[values.length - 1] * 10 + 50;
+  };
 
   const validateCeramicMeasuresStep = useCallback(() => {
     const newFieldsErrors: Record<string, string> = {};
@@ -135,6 +114,9 @@ export const Cut: React.FC = () => {
         case 1:
           return (
             <CutMeasures
+              measure="cm"
+              proportion={10}
+              maxCanvasHeight={cutMaxMeasure()}
               requestResponse={requestResponse}
               castMeasuresErrors={cutMeasuresErrors}
               castMeasures={cutMeasures}
@@ -145,8 +127,6 @@ export const Cut: React.FC = () => {
           return (
             <Checkout
               requestResponse={requestResponse}
-              cutPosition={cutPosition}
-              setCutPosition={setCutPosition}
               ceramicWidth={ceramicWidth as number}
               ceramicHeight={ceramicHeight as number}
             />
@@ -163,8 +143,6 @@ export const Cut: React.FC = () => {
       fieldsErrors,
       cutMeasures,
       cutMeasuresErrors,
-      cutPosition,
-      setCutPosition,
     ]
   );
 

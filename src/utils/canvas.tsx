@@ -19,7 +19,8 @@ export const applyValues = (values: Record<string, number>, key: string) =>
 
 export const drawTexts = (
   segments: Record<string, string[]>,
-  defaults?: Record<string, number>
+  defaults?: Record<string, number>,
+  proportion: number = MEASURE_PROPORTION
 ) =>
   Object.entries(segments).map(([key, value]) => {
     let midx: number;
@@ -28,20 +29,16 @@ export const drawTexts = (
     if (defaults) {
       const [x1, y1] = value[0]
         .split(';')
-        .map((v) => applyValues(defaults, v) * MEASURE_PROPORTION);
+        .map((v) => applyValues(defaults, v) * proportion);
       const [x2, y2] = value[1]
         .split(';')
-        .map((v) => applyValues(defaults, v) * MEASURE_PROPORTION);
+        .map((v) => applyValues(defaults, v) * proportion);
 
       midx = (x1 + x2) / 2 - 10;
       midy = (y1 + y2) / 2 - 13;
     } else {
-      const [x1, y1] = value[0]
-        .split(';')
-        .map((v) => Number(v) * MEASURE_PROPORTION);
-      const [x2, y2] = value[1]
-        .split(';')
-        .map((v) => Number(v) * MEASURE_PROPORTION);
+      const [x1, y1] = value[0].split(';').map((v) => Number(v) * proportion);
+      const [x2, y2] = value[1].split(';').map((v) => Number(v) * proportion);
 
       midx = (x1 + x2) / 2 - 10;
       midy = (y1 + y2) / 2 - 13;
@@ -58,9 +55,13 @@ export const drawTexts = (
 export const drawShape = (
   context: Konva.Context,
   shape: Konva.Shape,
-  cast: Cast
+  cast: Cast,
+  proportion: number = MEASURE_PROPORTION,
+  isDashed = false
 ) => {
   context.beginPath();
+
+  if (isDashed) context.setLineDash([10, 10]);
 
   for (let i = 0; i < cast.points.length; i += 1) {
     const { length } = cast.points;
@@ -68,11 +69,11 @@ export const drawShape = (
     const [a, b] = cast.points[i].split(';');
     const [c, d] = cast.points[(i + 1) % length].split(';');
 
-    const startX = applyValues(cast.defaults, a) * MEASURE_PROPORTION;
-    const startY = applyValues(cast.defaults, b) * MEASURE_PROPORTION;
+    const startX = applyValues(cast.defaults, a) * proportion;
+    const startY = applyValues(cast.defaults, b) * proportion;
 
-    const endX = applyValues(cast.defaults, c) * MEASURE_PROPORTION;
-    const endY = applyValues(cast.defaults, d) * MEASURE_PROPORTION;
+    const endX = applyValues(cast.defaults, c) * proportion;
+    const endY = applyValues(cast.defaults, d) * proportion;
 
     context.moveTo(startX, startY);
     context.lineTo(endX, endY);

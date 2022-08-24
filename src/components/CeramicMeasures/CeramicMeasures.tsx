@@ -36,7 +36,7 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
       <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
         <TextField
           required
-          label="Espaçamento"
+          label="Espaçamento (cm)"
           placeholder="Espaçamento"
           style={{ marginBottom: '24px' }}
           value={spacing}
@@ -81,7 +81,7 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
 
             <TextField
               required
-              label="Altura"
+              label="Altura (cm)"
               placeholder="Altura"
               style={{ marginLeft: '16px' }}
               className={classes.measuresInput}
@@ -100,9 +100,8 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
           <div className={classes.ceramicWidthContainer}>
             <TextField
               required
-              label="Comprimento"
+              label="Comprimento (cm)"
               placeholder="Comprimento"
-              className={classes.measuresInput}
               value={ceramicWidth}
               error={!!fieldsErrors.ceramicWidth}
               helperText={fieldsErrors.ceramicWidth}
