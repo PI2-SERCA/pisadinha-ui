@@ -12,7 +12,7 @@ import {
   drawTexts,
   getCanvasWidth,
   getCanvasHeight,
-  MEASURE_PROPORTION,
+  DEFAULT_MEASURE_PROPORTION,
 } from '../../utils/canvas';
 import NumberFormatCustom from '../NumberInputField';
 
@@ -94,7 +94,7 @@ export const CastMeasures: React.FC<CastMeasuresProps> = ({
 
 CastMeasures.defaultProps = {
   maxCanvasHeight: 900,
-  proportion: MEASURE_PROPORTION,
+  proportion: DEFAULT_MEASURE_PROPORTION,
 };
 
 export default CastMeasures;

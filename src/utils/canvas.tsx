@@ -6,7 +6,7 @@ import { Cast } from '../types';
 
 export const LINE_WIDTH = 5;
 
-export const MEASURE_PROPORTION = 50;
+export const DEFAULT_MEASURE_PROPORTION = 50;
 
 export const getCanvasWidth = (maxValue = 900) =>
   window.screen.availWidth > maxValue ? maxValue : window.screen.availWidth;
@@ -20,7 +20,7 @@ export const applyValues = (values: Record<string, number>, key: string) =>
 export const drawTexts = (
   segments: Record<string, string[]>,
   defaults?: Record<string, number>,
-  proportion: number = MEASURE_PROPORTION
+  proportion: number = DEFAULT_MEASURE_PROPORTION
 ) =>
   Object.entries(segments).map(([key, value]) => {
     let midx: number;
@@ -56,7 +56,7 @@ export const drawShape = (
   context: Konva.Context,
   shape: Konva.Shape,
   cast: Cast,
-  proportion: number = MEASURE_PROPORTION,
+  proportion: number = DEFAULT_MEASURE_PROPORTION,
   isDashed = false
 ) => {
   context.beginPath();

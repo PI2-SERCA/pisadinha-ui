@@ -22,6 +22,8 @@ const requestResponse: Cast = {
   name: 'Corte Quadrado',
 };
 
+const MEASURE_PROPORTION = 10;
+
 export const Cut: React.FC = () => {
   const classes = useStyles();
 
@@ -39,7 +41,8 @@ export const Cut: React.FC = () => {
   const cutMaxMeasure = () => {
     const values = Object.values(requestResponse.defaults);
 
-    return values.sort()[values.length - 1] * 10 + 50;
+    // + 50 is the offset
+    return values.sort()[values.length - 1] * MEASURE_PROPORTION + 50;
   };
 
   const validateCeramicMeasuresStep = useCallback(() => {
@@ -115,7 +118,7 @@ export const Cut: React.FC = () => {
           return (
             <CutMeasures
               measure="cm"
-              proportion={10}
+              proportion={MEASURE_PROPORTION}
               maxCanvasHeight={cutMaxMeasure()}
               requestResponse={requestResponse}
               castMeasuresErrors={cutMeasuresErrors}

@@ -9,6 +9,7 @@ import { CeramicMeasures as CeramicMeasuresStep } from '../../components/Ceramic
 import { Cast } from '../../types';
 
 import useStyles from './room-styles';
+import { DEFAULT_MEASURE_PROPORTION } from '../../utils/canvas';
 
 const steps = [
   'Medidas cerâmica',
@@ -51,6 +52,13 @@ export const Room: React.FC = () => {
   >({});
   const [selectedLayingStart, setSelectedLayingStart] = useState('');
   const [layingStartValid, setLayingStartValid] = useState(true);
+
+  const cutMaxMeasure = () => {
+    const values = Object.values(requestResponse.defaults);
+
+    // + 50 is the offset
+    return values.sort()[values.length - 1] * DEFAULT_MEASURE_PROPORTION + 50;
+  };
 
   const validateCeramicMeasuresStep = useCallback(() => {
     const newFieldsErrors: Record<string, string> = {};
@@ -138,6 +146,7 @@ export const Room: React.FC = () => {
           return (
             <RoomMeasures
               measure="m"
+              maxCanvasHeight={cutMaxMeasure()}
               requestResponse={requestResponse}
               castMeasuresErrors={roomMeasuresErrors}
               castMeasures={roomMeasures}
