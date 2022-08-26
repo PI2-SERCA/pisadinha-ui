@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Dispatch } from 'react';
 
 import { Box, TextField } from '@material-ui/core';
 
@@ -19,6 +19,9 @@ interface CheckoutProps {
   requestResponse: Cast;
   ceramicWidth: number;
   ceramicHeight: number;
+  cutRepetitions: number;
+  setCutRepetitions: Dispatch<number>;
+  checkoutErrors: Record<string, string>;
 }
 
 const MEASURE_PROPORTION = 10;
@@ -27,10 +30,11 @@ export const Checkout: React.FC<CheckoutProps> = ({
   requestResponse,
   ceramicWidth,
   ceramicHeight,
+  cutRepetitions,
+  setCutRepetitions,
+  checkoutErrors,
 }) => {
   const classes = useStyles();
-
-  const [cutRepetitions, setCutRepetitions] = useState(1);
 
   return (
     <>
@@ -40,6 +44,8 @@ export const Checkout: React.FC<CheckoutProps> = ({
           variant="outlined"
           value={cutRepetitions}
           label="Quantidade de repetições do corte"
+          error={!!checkoutErrors.cutRepetitions}
+          helperText={checkoutErrors.cutRepetitions}
           InputLabelProps={{ shrink: true }}
           style={{ minWidth: 300 }}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -62,7 +68,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
             />
           </Layer>
 
-          <Layer>
+          <Layer offsetX={-LINE_WIDTH - 10} offsetY={-LINE_WIDTH - 13}>
             <Shape
               stroke="red"
               strokeWidth={LINE_WIDTH}

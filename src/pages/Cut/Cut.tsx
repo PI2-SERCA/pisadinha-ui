@@ -31,6 +31,7 @@ export const Cut: React.FC = () => {
   const classes = useStyles();
 
   const [activeStep, setActiveStep] = useState(0);
+  const [cutRepetitions, setCutRepetitions] = useState(1);
   const [spacing, setSpacing] = useState<number | null>(null);
   const [ceramicDepth, setCeramicDepth] = useState<number | null>(null);
   const [ceramicWidth, setCeramicWidth] = useState<number | null>(null);
@@ -40,6 +41,9 @@ export const Cut: React.FC = () => {
   const [cutMeasuresErrors, setCutMeasuresErrors] = useState<
     Record<string, string>
   >({});
+  const [checkoutErrors, setCheckoutErrors] = useState<Record<string, string>>(
+    {}
+  );
 
   const cutMaxMeasure = () => {
     const values = Object.values(requestResponse.defaults);
@@ -72,15 +76,33 @@ export const Cut: React.FC = () => {
     return Object.keys(newFieldsErrors).length === 0;
   }, [cutMeasures, setCutMeasuresErrors]);
 
+  const validateCheckoutStep = useCallback(() => {
+    const newCheckoutErrors: Record<string, string> = {};
+
+    if (cutRepetitions <= 0) {
+      newCheckoutErrors.cutRepetitions =
+        'O número de repetições deve ser maior que 0';
+    }
+
+    setCheckoutErrors(newCheckoutErrors);
+
+    return Object.keys(newCheckoutErrors).length === 0;
+  }, [cutRepetitions, setCheckoutErrors]);
+
   const validateStep = useCallback(() => {
     if (activeStep === 0) return validateCeramicMeasuresStep();
 
     if (activeStep === 1) return validateCutMeasuresStep();
 
-    if (activeStep === 2) return true;
+    if (activeStep === 2) return validateCheckoutStep();
 
     return false;
-  }, [activeStep, validateCeramicMeasuresStep, validateCutMeasuresStep]);
+  }, [
+    activeStep,
+    validateCeramicMeasuresStep,
+    validateCutMeasuresStep,
+    validateCheckoutStep,
+  ]);
 
   const handleNext = useCallback(() => {
     if (!validateStep()) return;
@@ -128,6 +150,9 @@ export const Cut: React.FC = () => {
         case 2:
           return (
             <Checkout
+              checkoutErrors={checkoutErrors}
+              cutRepetitions={cutRepetitions}
+              setCutRepetitions={setCutRepetitions}
               requestResponse={requestResponse}
               ceramicWidth={ceramicWidth as number}
               ceramicHeight={ceramicHeight as number}
@@ -144,6 +169,9 @@ export const Cut: React.FC = () => {
       ceramicHeight,
       fieldsErrors,
       cutMeasures,
+      checkoutErrors,
+      cutRepetitions,
+      setCutRepetitions,
       cutMeasuresErrors,
     ]
   );
