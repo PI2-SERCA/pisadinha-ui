@@ -4,13 +4,15 @@ import { Step, Button, Stepper, StepLabel, Container } from '@material-ui/core';
 import { Checkout } from './steps/Checkout';
 import { LayingStart } from './steps/LayingStart';
 import { CastMeasures as RoomMeasures } from '../../components/CastMeasures';
-import { CeramicMeasures as CeramicMeasuresStep } from '../../components/CeramicMeasures';
+import {
+  CeramicMeasures as CeramicMeasuresStep,
+  validateCeramicMeasures,
+} from '../../components/CeramicMeasures';
 
 import { Cast, SettlementItem } from '../../types';
 
 import useStyles from './room-styles';
 import { DEFAULT_MEASURE_PROPORTION } from '../../utils/canvas';
-import { MAX_CERAMIC_SIZE } from '../../utils/number';
 
 const steps = [
   'Medidas cerâmica',
@@ -78,24 +80,13 @@ export const Room: React.FC = () => {
   };
 
   const validateCeramicMeasuresStep = useCallback(() => {
-    const newFieldsErrors: Record<string, string> = {};
-    const maxSizeMsg = `O tamanho máximo de cerâmica é ${MAX_CERAMIC_SIZE}x${MAX_CERAMIC_SIZE}`;
-
-    if (!spacing) newFieldsErrors.spacing = 'Espaçamento é obrigatório';
-    if (!ceramicDepth) newFieldsErrors.ceramicDepth = 'Espessura é obrigatório';
-
-    if (!ceramicWidth)
-      newFieldsErrors.ceramicWidth = 'Comprimento é obrigatório';
-    else if (ceramicWidth > MAX_CERAMIC_SIZE)
-      newFieldsErrors.ceramicWidth = maxSizeMsg;
-
-    if (!ceramicHeight) newFieldsErrors.ceramicHeight = 'Altura é obrigatório';
-    else if (ceramicHeight > MAX_CERAMIC_SIZE)
-      newFieldsErrors.ceramicHeight = maxSizeMsg;
-
-    setFieldsErrors(newFieldsErrors);
-
-    return Object.keys(newFieldsErrors).length === 0;
+    return validateCeramicMeasures({
+      spacing,
+      ceramicDepth,
+      ceramicWidth,
+      ceramicHeight,
+      setFieldsErrors,
+    });
   }, [spacing, ceramicDepth, ceramicWidth, ceramicHeight, setFieldsErrors]);
 
   const validateRoomMeasuresStep = useCallback(() => {

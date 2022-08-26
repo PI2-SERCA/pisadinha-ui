@@ -1,7 +1,7 @@
 import React, { Dispatch } from 'react';
 import { TextField } from '@material-ui/core';
 
-import { parseStrToFloat } from '../../utils/number';
+import { MAX_CERAMIC_SIZE, parseStrToFloat } from '../../utils/number';
 import NumberFormatCustom from '../NumberInputField';
 
 import useStyles from './ceramic-measures-styles';
@@ -16,7 +16,35 @@ interface CeramicMeasuresProps {
   ceramicHeight: number | null;
   setCeramicHeight: Dispatch<number | null>;
   fieldsErrors: Record<string, string>;
+  // eslint-disable-next-line react/no-unused-prop-types
+  setFieldsErrors?: Dispatch<Record<string, string>>;
 }
+
+export const validateCeramicMeasures = ({
+  spacing,
+  ceramicDepth,
+  ceramicWidth,
+  ceramicHeight,
+  setFieldsErrors,
+}: Partial<CeramicMeasuresProps>) => {
+  const newFieldsErrors: Record<string, string> = {};
+  const maxSizeMsg = `O tamanho máximo de cerâmica é ${MAX_CERAMIC_SIZE}x${MAX_CERAMIC_SIZE}`;
+
+  if (!spacing) newFieldsErrors.spacing = 'Espaçamento é obrigatório';
+  if (!ceramicDepth) newFieldsErrors.ceramicDepth = 'Espessura é obrigatório';
+
+  if (!ceramicWidth) newFieldsErrors.ceramicWidth = 'Comprimento é obrigatório';
+  else if (ceramicWidth > MAX_CERAMIC_SIZE)
+    newFieldsErrors.ceramicWidth = maxSizeMsg;
+
+  if (!ceramicHeight) newFieldsErrors.ceramicHeight = 'Altura é obrigatório';
+  else if (ceramicHeight > MAX_CERAMIC_SIZE)
+    newFieldsErrors.ceramicHeight = maxSizeMsg;
+
+  if (setFieldsErrors) setFieldsErrors(newFieldsErrors);
+
+  return Object.keys(newFieldsErrors).length === 0;
+};
 
 export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
   spacing,
@@ -117,6 +145,10 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
       </div>
     </>
   );
+};
+
+CeramicMeasures.defaultProps = {
+  setFieldsErrors: () => true,
 };
 
 export default CeramicMeasures;

@@ -2,7 +2,10 @@ import React, { useState, useCallback } from 'react';
 import { Step, Button, Stepper, StepLabel, Container } from '@material-ui/core';
 
 import { Checkout } from './steps/Checkout';
-import { CeramicMeasures } from '../../components/CeramicMeasures';
+import {
+  CeramicMeasures,
+  validateCeramicMeasures,
+} from '../../components/CeramicMeasures';
 import { CastMeasures as CutMeasures } from '../../components/CastMeasures';
 
 import { Cast } from '../../types';
@@ -46,17 +49,13 @@ export const Cut: React.FC = () => {
   };
 
   const validateCeramicMeasuresStep = useCallback(() => {
-    const newFieldsErrors: Record<string, string> = {};
-
-    if (!spacing) newFieldsErrors.spacing = 'Espaçamento é obrigatório';
-    if (!ceramicDepth) newFieldsErrors.ceramicDepth = 'Espessura é obrigatório';
-    if (!ceramicWidth)
-      newFieldsErrors.ceramicWidth = 'Comprimento é obrigatório';
-    if (!ceramicHeight) newFieldsErrors.ceramicHeight = 'Altura é obrigatório';
-
-    setFieldsErrors(newFieldsErrors);
-
-    return Object.keys(newFieldsErrors).length === 0;
+    return validateCeramicMeasures({
+      spacing,
+      ceramicDepth,
+      ceramicWidth,
+      ceramicHeight,
+      setFieldsErrors,
+    });
   }, [spacing, ceramicDepth, ceramicWidth, ceramicHeight, setFieldsErrors]);
 
   const validateCutMeasuresStep = useCallback(() => {
