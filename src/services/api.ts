@@ -23,7 +23,7 @@ export default class APIAdapter {
 
   async post(
     path: string,
-    data?: Record<string, never>,
+    data?: Record<string, unknown>,
     config?: AxiosRequestConfig
   ) {
     const res = await this.instance.post(path, data, config);
@@ -32,7 +32,7 @@ export default class APIAdapter {
 
   async patch(
     path: string,
-    data?: Record<string, never>,
+    data?: Record<string, unknown>,
     config?: AxiosRequestConfig
   ) {
     const res = await this.instance.patch(path, data, config);

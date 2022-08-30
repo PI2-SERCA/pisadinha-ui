@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { Step, Button, Stepper, StepLabel, Container } from '@material-ui/core';
 
 import { useHistory, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { Checkout } from './steps/Checkout';
 import {
   CeramicMeasures,
@@ -159,17 +160,36 @@ export const Cut: React.FC = () => {
   const handleSubmit = useCallback(async () => {
     if (!validateStep()) return;
 
-    const apiAdapter = new APIAdapter();
-
     try {
-      // TODO: fix submit
-      const response = await apiAdapter.get('/');
+      const apiAdapter = new APIAdapter();
 
-      console.log(response);
+      const params = {
+        repetitions: cutRepetitions,
+        ceramic_data: { width: ceramicWidth, height: ceramicHeight },
+        points: cut.points.map((point) =>
+          point.split(';').map((value) => applyValues(cutMeasures, value))
+        ),
+      };
+
+      await apiAdapter.post('single-cut', params);
+
+      toast.success('Corte enviado com sucesso!');
+
+      history.push('/');
     } catch (error) {
-      console.log(error);
+      toast.error(
+        'Não foi possível enviar o corte. Por favor tente novamente.'
+      );
     }
-  }, [validateStep]);
+  }, [
+    cut,
+    history,
+    cutMeasures,
+    ceramicWidth,
+    ceramicHeight,
+    cutRepetitions,
+    validateStep,
+  ]);
 
   const getStepContent = useCallback(
     (step: number): JSX.Element => {
