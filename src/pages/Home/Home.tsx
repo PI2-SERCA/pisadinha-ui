@@ -95,7 +95,7 @@ export const Home: React.FC = () => {
                     )
                   }
                 >
-                  <ItemCard type={selectedTab === 0 ? 'room' : 'cut'} />
+                  <ItemCard name={cast.name} base64={cast.base64} />
                 </Grid>
               ))}
             </Grid>
