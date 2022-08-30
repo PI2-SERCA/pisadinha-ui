@@ -16,7 +16,7 @@ import useStyles from './checkout-styles';
 import { Cast } from '../../../../types';
 
 interface CheckoutProps {
-  requestResponse: Cast;
+  cut: Cast;
   ceramicWidth: number;
   ceramicHeight: number;
   cutRepetitions: number;
@@ -27,7 +27,7 @@ interface CheckoutProps {
 const MEASURE_PROPORTION = 10;
 
 export const Checkout: React.FC<CheckoutProps> = ({
-  requestResponse,
+  cut,
   ceramicWidth,
   ceramicHeight,
   cutRepetitions,
@@ -73,7 +73,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
               stroke="red"
               strokeWidth={LINE_WIDTH}
               sceneFunc={(context: Konva.Context, shape: Konva.Shape) =>
-                drawShape(context, shape, requestResponse, 10, true)
+                drawShape(context, shape, cut, 10, true)
               }
             />
           </Layer>

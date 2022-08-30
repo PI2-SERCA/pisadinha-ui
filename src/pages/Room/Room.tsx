@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Step, Button, Stepper, StepLabel, Container } from '@material-ui/core';
 
+import { useParams } from 'react-router-dom';
 import { Checkout } from './steps/Checkout';
 import { LayingStart } from './steps/LayingStart';
 import { CastMeasures as RoomMeasures } from '../../components/CastMeasures';
@@ -13,6 +14,7 @@ import { Cast, SettlementItem } from '../../types';
 
 import useStyles from './room-styles';
 import { DEFAULT_MEASURE_PROPORTION } from '../../utils/canvas';
+import APIAdapter from '../../services/api';
 
 const steps = [
   'Medidas cerâmica',
@@ -21,29 +23,15 @@ const steps = [
   'Revisão',
 ];
 
-const requestResponse: Cast = {
-  points: ['0;0', '0;a', 'b;a', 'b;c', 'd;c', 'd;0'],
-  defaults: {
-    a: 4,
-    b: 2,
-    c: 7,
-    d: 5,
-  },
-  segments: {
-    a: ['0;0', '0;a'],
-    b: ['0;a', 'b;a'],
-    c: ['d;c', 'd;0'],
-    d: ['0;0', 'd;0'],
-  },
-  name: 'Formato em L',
-};
-
 // TODO: Descer os botões e passar callbacks de onCancel e onSubmit e cada step controla
 // seu estado interno
 export const Room: React.FC = () => {
   const classes = useStyles();
 
+  const { roomData } = useParams<{ roomData: string }>();
+
   const [activeStep, setActiveStep] = useState(0);
+  const [room, setRoom] = useState<Cast>({} as Cast);
   const [roomRepetitions, setRoomRepetitions] = useState(1);
   const [spacing, setSpacing] = useState<number | null>(null);
   const [ceramicDepth, setCeramicDepth] = useState<number | null>(null);
@@ -72,12 +60,12 @@ export const Room: React.FC = () => {
       .map((item, idx) => ({ ...item, id: `irineu${idx}` }))
   );
 
-  const cutMaxMeasure = () => {
-    const values = Object.values(requestResponse.defaults);
+  const cutMaxMeasure = useCallback(() => {
+    const values = Object.values(room.defaults);
 
     // + 50 is the offset
     return values.sort()[values.length - 1] * DEFAULT_MEASURE_PROPORTION + 50;
-  };
+  }, [room]);
 
   const validateCeramicMeasuresStep = useCallback(() => {
     return validateCeramicMeasures({
@@ -92,7 +80,7 @@ export const Room: React.FC = () => {
   const validateRoomMeasuresStep = useCallback(() => {
     const newFieldsErrors: Record<string, string> = {};
 
-    Object.keys(requestResponse.segments).forEach((key) => {
+    Object.keys(room.segments).forEach((key) => {
       if (!roomMeasures[key]) {
         newFieldsErrors[key] = `${key.toUpperCase()} é obrigatório`;
       }
@@ -101,7 +89,7 @@ export const Room: React.FC = () => {
     setRoomMeasuresErrors(newFieldsErrors);
 
     return Object.keys(newFieldsErrors).length === 0;
-  }, [roomMeasures, setRoomMeasuresErrors]);
+  }, [room, roomMeasures, setRoomMeasuresErrors]);
 
   const validateLayingStartStep = useCallback(() => {
     setLayingStartValid(!!selectedLayingStart);
@@ -156,8 +144,19 @@ export const Room: React.FC = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   }, []);
 
-  const handleSubmit = useCallback(() => {
-    validateStep();
+  const handleSubmit = useCallback(async () => {
+    if (!validateStep()) return;
+
+    const apiAdapter = new APIAdapter();
+
+    try {
+      // TODO: fix submit
+      const response = await apiAdapter.get('/');
+
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   }, [validateStep]);
 
   const getStepContent = useCallback(
@@ -181,8 +180,8 @@ export const Room: React.FC = () => {
           return (
             <RoomMeasures
               measure="m"
+              cast={room}
               maxCanvasHeight={cutMaxMeasure()}
-              requestResponse={requestResponse}
               castMeasuresErrors={roomMeasuresErrors}
               castMeasures={roomMeasures}
               setCastMeasures={setRoomMeasures}
@@ -191,7 +190,7 @@ export const Room: React.FC = () => {
         case 2:
           return (
             <LayingStart
-              requestResponse={requestResponse}
+              room={room}
               layingStartValid={layingStartValid}
               selectedLayingStart={selectedLayingStart}
               setSelectedLayingStart={setSelectedLayingStart}
@@ -213,6 +212,7 @@ export const Room: React.FC = () => {
       }
     },
     [
+      room,
       spacing,
       ceramicDepth,
       ceramicWidth,
@@ -229,8 +229,15 @@ export const Room: React.FC = () => {
       selectedLayingStart,
       setSelectedLayingStart,
       layingStartValid,
+      cutMaxMeasure,
     ]
   );
+
+  useEffect(() => {
+    if (roomData) {
+      setRoom(JSON.parse(roomData));
+    }
+  }, [roomData]);
 
   return (
     <Container className={classes.container}>

@@ -28,7 +28,7 @@ import useStyles from './laying-start-styles';
 import { Cast } from '../../../../types';
 
 interface LayingStartProps {
-  requestResponse: Cast;
+  room: Cast;
   layingStartValid: boolean;
   selectedLayingStart: string;
   setSelectedLayingStart: Dispatch<string>;
@@ -87,7 +87,7 @@ function calculateAllCuts(uniqueCuts: [[any[], number]]): number {
 }
 
 export const LayingStart: React.FC<LayingStartProps> = ({
-  requestResponse,
+  room,
   layingStartValid,
   selectedLayingStart,
   setSelectedLayingStart,
@@ -122,7 +122,7 @@ export const LayingStart: React.FC<LayingStartProps> = ({
             stroke="black"
             strokeWidth={LINE_WIDTH}
             sceneFunc={(context: Konva.Context, shape: Konva.Shape) =>
-              drawShape(context, shape, requestResponse)
+              drawShape(context, shape, room)
             }
           />
 

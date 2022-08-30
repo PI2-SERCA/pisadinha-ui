@@ -12,7 +12,11 @@ const useStyles = makeStyles({
   },
 });
 
-export const ItemCard: React.FC<{ type: 'room' | 'cut' }> = ({ type }) => {
+interface ItemCardProps {
+  type: 'room' | 'cut';
+}
+
+export const ItemCard: React.FC<ItemCardProps> = ({ type }) => {
   const classes = useStyles();
 
   return (
