@@ -23,6 +23,7 @@ interface CeramicMeasuresProps {
 
 export const validateCeramicMeasures = ({
   spacing,
+  isLaying,
   ceramicDepth,
   ceramicWidth,
   ceramicHeight,
@@ -31,7 +32,8 @@ export const validateCeramicMeasures = ({
   const newFieldsErrors: Record<string, string> = {};
   const maxSizeMsg = `O tamanho máximo de cerâmica é ${MAX_CERAMIC_SIZE}x${MAX_CERAMIC_SIZE}`;
 
-  if (!spacing) newFieldsErrors.spacing = 'Espaçamento é obrigatório';
+  if (isLaying && !spacing)
+    newFieldsErrors.spacing = 'Espaçamento é obrigatório';
   if (!ceramicDepth) newFieldsErrors.ceramicDepth = 'Espessura é obrigatório';
 
   if (!ceramicWidth) newFieldsErrors.ceramicWidth = 'Comprimento é obrigatório';
