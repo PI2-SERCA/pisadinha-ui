@@ -169,6 +169,7 @@ export const Room: React.FC = () => {
         case 0:
           return (
             <CeramicMeasuresStep
+              isLaying
               spacing={spacing}
               setSpacing={setSpacing}
               ceramicDepth={ceramicDepth}

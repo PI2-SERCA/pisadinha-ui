@@ -1,5 +1,5 @@
 import React, { Dispatch } from 'react';
-import { TextField } from '@material-ui/core';
+import { Box, TextField } from '@material-ui/core';
 
 import { MAX_CERAMIC_SIZE, parseStrToFloat } from '../../utils/number';
 import NumberFormatCustom from '../NumberInputField';
@@ -7,6 +7,7 @@ import NumberFormatCustom from '../NumberInputField';
 import useStyles from './ceramic-measures-styles';
 
 interface CeramicMeasuresProps {
+  isLaying?: boolean;
   spacing: number | null;
   setSpacing: Dispatch<number | null>;
   ceramicDepth: number | null;
@@ -47,6 +48,7 @@ export const validateCeramicMeasures = ({
 };
 
 export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
+  isLaying,
   spacing,
   setSpacing,
   ceramicDepth,
@@ -61,26 +63,30 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
 
   return (
     <>
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <TextField
-          required
-          label="Espaçamento (cm)"
-          placeholder="Espaçamento"
-          style={{ marginBottom: '24px' }}
-          value={spacing}
-          error={!!fieldsErrors.spacing}
-          helperText={fieldsErrors.spacing}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setSpacing(parseStrToFloat(e.target.value));
-          }}
-          InputProps={{
-            inputComponent: NumberFormatCustom as React.FC,
-          }}
-        />
-      </div>
+      {isLaying && (
+        <Box
+          style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+        >
+          <TextField
+            required
+            label="Espaçamento (cm)"
+            placeholder="Espaçamento"
+            style={{ marginBottom: '24px' }}
+            value={spacing}
+            error={!!fieldsErrors.spacing}
+            helperText={fieldsErrors.spacing}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setSpacing(parseStrToFloat(e.target.value));
+            }}
+            InputProps={{
+              inputComponent: NumberFormatCustom as React.FC,
+            }}
+          />
+        </Box>
+      )}
 
-      <div className={classes.ceramicContainer}>
-        <div className={classes.measuresCeramic}>
+      <Box className={classes.ceramicContainer}>
+        <Box className={classes.measuresCeramic}>
           <div className={classes.ceramicDepth} />
 
           <TextField
@@ -99,12 +105,12 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
               inputComponent: NumberFormatCustom as React.FC,
             }}
           />
-        </div>
+        </Box>
 
-        <div className={classes.ceramic} />
+        {isLaying && <div className={classes.ceramic} />}
 
-        <div className={classes.measuresCeramic}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+        <Box className={classes.measuresCeramic}>
+          <Box style={{ display: 'flex', alignItems: 'center' }}>
             <div className={classes.ceramic} />
 
             <TextField
@@ -123,9 +129,9 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
                 inputComponent: NumberFormatCustom as React.FC,
               }}
             />
-          </div>
+          </Box>
 
-          <div className={classes.ceramicWidthContainer}>
+          <Box className={classes.ceramicWidthContainer}>
             <TextField
               required
               label="Comprimento (cm)"
@@ -140,14 +146,15 @@ export const CeramicMeasures: React.FC<CeramicMeasuresProps> = ({
                 inputComponent: NumberFormatCustom as React.FC,
               }}
             />
-          </div>
-        </div>
-      </div>
+          </Box>
+        </Box>
+      </Box>
     </>
   );
 };
 
 CeramicMeasures.defaultProps = {
+  isLaying: false,
   setFieldsErrors: () => true,
 };
 
