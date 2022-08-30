@@ -14,8 +14,8 @@ const Routes: React.FC = () => (
   <Router>
     <Switch>
       <Route exact path="/" component={Home} />
-      <Route exact path="/room/:roomData" component={Room} />
-      <Route exact path="/cut/:cutData" component={Cut} />
+      <Route exact path="/room/:roomIdx" component={Room} />
+      <Route exact path="/cut/:cutIdx" component={Cut} />
 
       <Redirect to="/" />
     </Switch>

@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { Step, Button, Stepper, StepLabel, Container } from '@material-ui/core';
 
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { Checkout } from './steps/Checkout';
 import { LayingStart } from './steps/LayingStart';
 import { CastMeasures as RoomMeasures } from '../../components/CastMeasures';
@@ -15,6 +15,7 @@ import { Cast, SettlementItem } from '../../types';
 import useStyles from './room-styles';
 import { DEFAULT_MEASURE_PROPORTION } from '../../utils/canvas';
 import APIAdapter from '../../services/api';
+import { PiseiroDataContext } from '../../hooks/PiseiroData';
 
 const steps = [
   'Medidas cerâmica',
@@ -27,8 +28,11 @@ const steps = [
 // seu estado interno
 export const Room: React.FC = () => {
   const classes = useStyles();
+  const history = useHistory();
 
-  const { roomData } = useParams<{ roomData: string }>();
+  const { roomIdx } = useParams<{ roomIdx: string }>();
+
+  const { rooms } = useContext(PiseiroDataContext);
 
   const [activeStep, setActiveStep] = useState(0);
   const [room, setRoom] = useState<Cast>({} as Cast);
@@ -234,10 +238,14 @@ export const Room: React.FC = () => {
   );
 
   useEffect(() => {
-    if (roomData) {
-      setRoom(JSON.parse(roomData));
+    const idx = parseInt(roomIdx, 10);
+
+    if (!roomIdx || Number.isNaN(idx) || (!Number.isNaN(idx) && !rooms[idx])) {
+      history.push('/');
+    } else {
+      setRoom(rooms[parseInt(roomIdx, 10)]);
     }
-  }, [roomData]);
+  }, [rooms, roomIdx, history, setRoom]);
 
   return (
     <Container className={classes.container}>

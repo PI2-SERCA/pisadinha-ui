@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Box,
   Tab,
@@ -14,32 +14,44 @@ import { useHistory } from 'react-router-dom';
 import { ItemCard } from '../../layout';
 import APIAdapter from '../../services/api';
 import { Cast } from '../../types';
+import { PiseiroDataContext } from '../../hooks/PiseiroData';
 
 export const Home: React.FC = () => {
   const history = useHistory();
 
-  const [error, setError] = useState(false);
+  const { cuts, setCuts, rooms, setRooms } = useContext(PiseiroDataContext);
+
+  const [error, setError] = useState(true);
   const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [requestResponse, setRequestResponse] = useState<Cast[]>([]);
 
-  useEffect(() => {
+  const getList = () => (selectedTab === 0 ? rooms : cuts);
+
+  const fetchCasts = async (
+    endpoint: 'rooms' | 'cuts',
+    setState: React.Dispatch<React.SetStateAction<Cast[]>>
+  ) => {
     const apiAdapter = new APIAdapter();
 
     setLoading(true);
 
-    apiAdapter
-      .get(selectedTab === 0 ? 'rooms' : 'cuts')
-      .then((response) => {
-        setRequestResponse(response);
-        setError(false);
-      })
-      .catch(() => {
-        setError(true);
-        setRequestResponse([]);
-      })
-      .finally(() => setLoading(false));
-  }, [selectedTab]);
+    try {
+      const response = await apiAdapter.get(endpoint);
+
+      setError(false);
+      setState(response);
+    } catch {
+      setError(true);
+      setState([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedTab === 0) fetchCasts('rooms', setRooms);
+    else fetchCasts('cuts', setCuts);
+  }, [selectedTab, setRooms, setCuts]);
 
   return (
     <Container maxWidth="lg" style={{ marginTop: 32 }}>
@@ -69,7 +81,7 @@ export const Home: React.FC = () => {
             </Typography>
           ) : (
             <Grid container spacing={2}>
-              {requestResponse.map((cast) => (
+              {getList().map((cast, idx) => (
                 <Grid
                   item
                   key={cast.name}
@@ -79,9 +91,7 @@ export const Home: React.FC = () => {
                   lg={2}
                   onClick={() =>
                     history.push(
-                      `/${selectedTab === 0 ? 'room' : 'cut'}/${JSON.stringify(
-                        cast
-                      )}`
+                      `/${selectedTab === 0 ? 'room' : 'cut'}/${idx}`
                     )
                   }
                 >

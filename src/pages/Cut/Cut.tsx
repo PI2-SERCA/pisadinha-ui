@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { Step, Button, Stepper, StepLabel, Container } from '@material-ui/core';
 
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { Checkout } from './steps/Checkout';
 import {
   CeramicMeasures,
@@ -13,6 +13,7 @@ import { Cast } from '../../types';
 
 import useStyles from './cut-styles';
 import APIAdapter from '../../services/api';
+import { PiseiroDataContext } from '../../hooks/PiseiroData';
 
 const steps = ['Medidas cerâmica', 'Medidas corte', 'Preview'];
 
@@ -20,8 +21,11 @@ const MEASURE_PROPORTION = 10;
 
 export const Cut: React.FC = () => {
   const classes = useStyles();
+  const history = useHistory();
 
-  const { cutData } = useParams<{ cutData: string }>();
+  const { cutIdx } = useParams<{ cutIdx: string }>();
+
+  const { cuts } = useContext(PiseiroDataContext);
 
   const [activeStep, setActiveStep] = useState(0);
   const [cut, setCut] = useState<Cast>({} as Cast);
@@ -184,10 +188,14 @@ export const Cut: React.FC = () => {
   );
 
   useEffect(() => {
-    if (cutData) {
-      setCut(JSON.parse(cutData));
+    const idx = parseInt(cutIdx, 10);
+
+    if (!cutIdx || Number.isNaN(idx) || (!Number.isNaN(idx) && !cuts[idx])) {
+      history.push('/');
+    } else {
+      setCut(cuts[parseInt(cutIdx, 10)]);
     }
-  }, [cutData]);
+  }, [cuts, cutIdx, history]);
 
   return (
     <Container className={classes.container}>
