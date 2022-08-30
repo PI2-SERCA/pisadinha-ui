@@ -14,6 +14,7 @@ import { Cast } from '../../types';
 import useStyles from './cut-styles';
 import APIAdapter from '../../services/api';
 import { PiseiroDataContext } from '../../hooks/PiseiroData';
+import { applyValues } from '../../utils/canvas';
 
 const steps = ['Medidas cerâmica', 'Medidas corte', 'Preview'];
 
@@ -60,19 +61,62 @@ export const Cut: React.FC = () => {
     });
   }, [spacing, ceramicDepth, ceramicWidth, ceramicHeight, setFieldsErrors]);
 
+  const keyErrorMessage = (key: string, message: string) =>
+    `"${key.toUpperCase()}" ${message}`;
+
+  const validateAxisValues = useCallback(
+    (points: string[]) => {
+      const errors: Record<string, string> = {};
+
+      if (!ceramicWidth || !ceramicHeight) return {};
+
+      points.forEach((point) => {
+        const [xKey, yKey] = point.split(';');
+        const xValue = applyValues(cutMeasures, xKey);
+        const yValue = applyValues(cutMeasures, yKey);
+
+        if (xValue > ceramicWidth) {
+          errors[xKey] = keyErrorMessage(
+            xKey,
+            'não pode ser maior as dimensões da cerâmica'
+          );
+        }
+
+        if (yValue > ceramicHeight) {
+          errors[yKey] = keyErrorMessage(
+            yKey,
+            'não pode ser maior as dimensões da cerâmica'
+          );
+        }
+      });
+
+      return errors;
+    },
+    [cutMeasures, ceramicWidth, ceramicHeight]
+  );
+
   const validateCutMeasuresStep = useCallback(() => {
-    const newFieldsErrors: Record<string, string> = {};
+    let missingValue = false;
+    let newFieldsErrors: Record<string, string> = {};
 
     Object.keys(cut.segments).forEach((key) => {
       if (!cutMeasures[key]) {
-        newFieldsErrors[key] = `${key.toUpperCase()} é obrigatório`;
+        missingValue = true;
+        newFieldsErrors[key] = keyErrorMessage(key, 'é obrigatório');
       }
     });
+
+    if (!missingValue) {
+      newFieldsErrors = {
+        ...newFieldsErrors,
+        ...validateAxisValues(cut.points),
+      };
+    }
 
     setCutMeasuresErrors(newFieldsErrors);
 
     return Object.keys(newFieldsErrors).length === 0;
-  }, [cut, cutMeasures, setCutMeasuresErrors]);
+  }, [cut, cutMeasures, setCutMeasuresErrors, validateAxisValues]);
 
   const validateCheckoutStep = useCallback(() => {
     const newCheckoutErrors: Record<string, string> = {};
@@ -159,10 +203,11 @@ export const Cut: React.FC = () => {
         case 2:
           return (
             <Checkout
+              cut={cut}
+              cutMeasures={cutMeasures}
               checkoutErrors={checkoutErrors}
               cutRepetitions={cutRepetitions}
               setCutRepetitions={setCutRepetitions}
-              cut={cut}
               ceramicWidth={ceramicWidth as number}
               ceramicHeight={ceramicHeight as number}
             />

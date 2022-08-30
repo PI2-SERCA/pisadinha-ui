@@ -20,6 +20,7 @@ interface CheckoutProps {
   ceramicWidth: number;
   ceramicHeight: number;
   cutRepetitions: number;
+  cutMeasures: Record<string, number>;
   setCutRepetitions: Dispatch<number>;
   checkoutErrors: Record<string, string>;
 }
@@ -28,6 +29,7 @@ const MEASURE_PROPORTION = 10;
 
 export const Checkout: React.FC<CheckoutProps> = ({
   cut,
+  cutMeasures,
   ceramicWidth,
   ceramicHeight,
   cutRepetitions,
@@ -73,7 +75,13 @@ export const Checkout: React.FC<CheckoutProps> = ({
               stroke="red"
               strokeWidth={LINE_WIDTH}
               sceneFunc={(context: Konva.Context, shape: Konva.Shape) =>
-                drawShape(context, shape, cut, 10, true)
+                drawShape(
+                  context,
+                  shape,
+                  { ...cut, defaults: cutMeasures },
+                  10,
+                  true
+                )
               }
             />
           </Layer>
