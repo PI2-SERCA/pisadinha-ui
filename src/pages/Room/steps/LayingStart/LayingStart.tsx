@@ -151,6 +151,16 @@ export const LayingStart: React.FC<LayingStartProps> = ({
     }
   }, [room, roomMeasures, setCorners, setLoading]);
 
+  const calcNumberOfCuts = () => {
+    let count = 0;
+
+    positionData[selectedLayingStart]?.cuts.forEach((cut) => {
+      count += cut.quantity;
+    });
+
+    return count;
+  };
+
   useEffect(() => {
     fetchCorners();
   }, [fetchCorners]);
@@ -219,7 +229,7 @@ export const LayingStart: React.FC<LayingStartProps> = ({
               disabled
               label="Cerâmicas cortadas"
               style={{ marginLeft: 32 }}
-              value={positionData[selectedLayingStart]?.cuts.length}
+              value={calcNumberOfCuts()}
             />
           </Box>
         )}
