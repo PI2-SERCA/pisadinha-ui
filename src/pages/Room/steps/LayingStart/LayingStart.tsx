@@ -68,7 +68,11 @@ export const LayingStart: React.FC<LayingStartProps> = ({
   const [loadingPosition, setLoadingPosition] = useState(false);
   const [corners, setCorners] = useState<Record<string, string[]>>({});
 
-  const fetchPositionData = async (): Promise<PositionData['key']> => {
+  const fetchPositionData = async (
+    key: string
+  ): Promise<PositionData['key'] | null> => {
+    if (positionData[key]) return null;
+
     try {
       const apiAdapter = new APIAdapter();
 
@@ -102,10 +106,10 @@ export const LayingStart: React.FC<LayingStartProps> = ({
   const handleStartChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const key = e.target.value as string;
 
-    if (!positionData[key]) {
-      fetchPositionData().then((data) => {
-        setSelectedLayingStart(key);
+    fetchPositionData(key).then((data) => {
+      setSelectedLayingStart(key);
 
+      if (data !== null) {
         setPositionData((prev) => ({
           ...prev,
           [key]: {
@@ -113,8 +117,8 @@ export const LayingStart: React.FC<LayingStartProps> = ({
             cuts: data.cuts.map((item, idx) => ({ ...item, id: `cut-${idx}` })),
           },
         }));
-      });
-    }
+      }
+    });
   };
 
   const fetchCorners = useCallback(async () => {
