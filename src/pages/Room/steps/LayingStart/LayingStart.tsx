@@ -1,4 +1,4 @@
-import React, { Dispatch, useState } from 'react';
+import React, { Dispatch, useCallback, useEffect, useState } from 'react';
 import { Stage, Layer, Shape } from 'react-konva';
 
 import Konva from 'konva/lib/index-types';
@@ -15,6 +15,7 @@ import {
   CircularProgress,
 } from '@material-ui/core';
 
+import { toast } from 'react-toastify';
 import {
   LINE_WIDTH,
   drawTexts,
@@ -25,69 +26,38 @@ import {
 
 import useStyles from './laying-start-styles';
 
-import { Cast } from '../../../../types';
+import { Cast, Cut } from '../../../../types';
+import APIAdapter from '../../../../services/api';
+import { getPolygonPoints } from '../../../../utils/number';
 
 interface LayingStartProps {
   room: Cast;
+  spacing: number | null;
   layingStartValid: boolean;
   selectedLayingStart: string;
+  ceramicWidth: number | null;
+  ceramicHeight: number | null;
+  roomMeasures: Record<string, number>;
   setSelectedLayingStart: Dispatch<string>;
+  positionData: PositionData;
+  setPositionData: React.Dispatch<React.SetStateAction<PositionData>>;
 }
 
 interface PositionData {
   [key: string]: {
     full: number;
-    uniqueCuts: [[any[], number]];
+    cuts: Cut[];
   };
-}
-
-const State: PositionData = {
-  A: {
-    full: 20,
-    uniqueCuts: [[[], 5]],
-  },
-  B: {
-    full: 40,
-    uniqueCuts: [[[], 0]],
-  },
-  C: {
-    full: 10,
-    uniqueCuts: [[[], 32]],
-  },
-  D: {
-    full: 4,
-    uniqueCuts: [[[], 67]],
-  },
-  E: {
-    full: 9,
-    uniqueCuts: [[[], 40]],
-  },
-};
-
-const corners: {
-  segments: Record<string, string[]>;
-} = {
-  segments: {
-    A: ['0;0', '0;0'],
-    B: ['0;4', '0;4'],
-    C: ['2;7', '2;7'],
-    D: ['5;7', '5;7'],
-    E: ['5;0', '5;0'],
-  },
-};
-
-function calculateAllCuts(uniqueCuts: [[any[], number]]): number {
-  let total = 0;
-
-  uniqueCuts.forEach((cut) => {
-    total += cut[1];
-  });
-
-  return total;
 }
 
 export const LayingStart: React.FC<LayingStartProps> = ({
   room,
+  spacing,
+  positionData,
+  setPositionData,
+  ceramicWidth,
+  ceramicHeight,
+  roomMeasures,
   layingStartValid,
   selectedLayingStart,
   setSelectedLayingStart,
@@ -95,24 +65,103 @@ export const LayingStart: React.FC<LayingStartProps> = ({
   const classes = useStyles();
 
   const [loading, setLoading] = useState(false);
-  const [positionData, setPositionData] = useState<PositionData>(State);
+  const [loadingPosition, setLoadingPosition] = useState(false);
+  const [corners, setCorners] = useState<Record<string, string[]>>({});
+
+  const fetchPositionData = async (): Promise<PositionData['key']> => {
+    try {
+      const apiAdapter = new APIAdapter();
+
+      setLoadingPosition(true);
+
+      const points = getPolygonPoints(room.points, roomMeasures);
+
+      const response: { floor_laying: { full: number; cuts: Cut[] } } =
+        await apiAdapter.get('floor-laying', {
+          params: {
+            points: JSON.stringify(points),
+            corner: 1,
+            ceramic_data: JSON.stringify({
+              spacing,
+              width: ceramicWidth,
+              height: ceramicHeight,
+            }),
+          },
+        });
+
+      return response.floor_laying;
+    } catch {
+      toast.error('Não foi possível obter os dados desse ponto de início');
+
+      return { full: 0, cuts: [] };
+    } finally {
+      setLoadingPosition(false);
+    }
+  };
 
   const handleStartChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const key = e.target.value as string;
 
-    setLoading(true);
-
-    setTimeout(() => setLoading(false), 1000);
-
-    setSelectedLayingStart(key);
-
     if (!positionData[key]) {
-      setPositionData((prev) => ({
-        ...prev,
-        [key]: { full: 0, uniqueCuts: [[[], 0]] },
-      }));
+      fetchPositionData().then((data) => {
+        setSelectedLayingStart(key);
+
+        setPositionData((prev) => ({
+          ...prev,
+          [key]: {
+            ...data,
+            cuts: data.cuts.map((item, idx) => ({ ...item, id: `cut-${idx}` })),
+          },
+        }));
+      });
     }
   };
+
+  const fetchCorners = useCallback(async () => {
+    try {
+      const apiAdapter = new APIAdapter();
+
+      setLoading(true);
+
+      const points = getPolygonPoints(room.points, roomMeasures);
+
+      const response: { corners: number[] } = await apiAdapter.get('corners', {
+        params: { points: JSON.stringify(points) },
+      });
+
+      const newCorners: Record<string, string[]> = {};
+
+      const alphabet = Array.from(Array(26)).map((_, i) =>
+        String.fromCharCode(i + 65)
+      );
+
+      response.corners.forEach((cornerIdx, idx) => {
+        const [x, y] = points[cornerIdx];
+
+        newCorners[alphabet[idx]] = [`${x};${y}`, `${x};${y}`];
+      });
+
+      setCorners(newCorners);
+    } catch {
+      toast.error(
+        'Não foi possível obter os pontos de início de assentamento.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [room, roomMeasures, setCorners, setLoading]);
+
+  useEffect(() => {
+    fetchCorners();
+  }, [fetchCorners]);
+
+  if (loading) {
+    return (
+      <Box style={{ display: 'flex', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -126,7 +175,7 @@ export const LayingStart: React.FC<LayingStartProps> = ({
             }
           />
 
-          {drawTexts(corners.segments)}
+          {drawTexts(corners)}
         </Layer>
       </Stage>
 
@@ -144,7 +193,7 @@ export const LayingStart: React.FC<LayingStartProps> = ({
             style={{ minWidth: 150 }}
             onChange={handleStartChange}
           >
-            {Object.keys(corners.segments).map((key) => (
+            {Object.keys(corners).map((key) => (
               <MenuItem key={key} value={key.toUpperCase()}>
                 {key.toUpperCase()}
               </MenuItem>
@@ -156,7 +205,7 @@ export const LayingStart: React.FC<LayingStartProps> = ({
           )}
         </FormControl>
 
-        {loading ? (
+        {loadingPosition ? (
           <CircularProgress color="primary" />
         ) : (
           <Box>
@@ -168,11 +217,9 @@ export const LayingStart: React.FC<LayingStartProps> = ({
 
             <TextField
               disabled
-              value={calculateAllCuts(
-                positionData[selectedLayingStart]?.uniqueCuts || []
-              )}
-              style={{ marginLeft: 32 }}
               label="Cerâmicas cortadas"
+              style={{ marginLeft: 32 }}
+              value={positionData[selectedLayingStart]?.cuts.length}
             />
           </Box>
         )}

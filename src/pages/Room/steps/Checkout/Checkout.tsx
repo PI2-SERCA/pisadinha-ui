@@ -12,10 +12,10 @@ import {
 import useStyles from './checkout-styles';
 
 import { base64ToUrl } from '../../../../utils/image';
-import { SettlementItem } from '../../../../types';
+import { Cut } from '../../../../types';
 
 interface CheckoutProps {
-  settlementData: SettlementItem[];
+  settlementData: Cut[];
   roomRepetitions: number;
   setRoomRepetitions: Dispatch<number>;
   notSelected: Record<string, boolean>;
@@ -62,7 +62,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
       </Typography>
 
       <Box className={classes.cutList}>
-        {settlementData.map(({ id, repeat, cutImage }) => (
+        {settlementData.map(({ id, quantity, base64 }) => (
           <Card
             key={id}
             className={classes.card}
@@ -81,7 +81,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
                 component="h2"
                 style={{ marginBottom: 0 }}
               >
-                {repeat}
+                {quantity}
               </Typography>
 
               <Typography variant="h4" component="h2">
@@ -91,7 +91,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
               <CardMedia
                 component="img"
                 alt="Imagem corte"
-                image={base64ToUrl(cutImage)}
+                image={base64ToUrl(base64)}
                 className={classes.cutImage}
               />
             </Box>

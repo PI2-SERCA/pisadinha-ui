@@ -6,8 +6,9 @@ export interface Cast {
   segments: Record<string, string[]>;
 }
 
-export interface SettlementItem {
+export interface Cut {
   id: string;
-  repeat: number;
-  cutImage: string;
+  base64: string;
+  quantity: number;
+  points: [number, number][];
 }
