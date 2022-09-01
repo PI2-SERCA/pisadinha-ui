@@ -17,6 +17,7 @@ import useStyles from './room-styles';
 import { DEFAULT_MEASURE_PROPORTION } from '../../utils/canvas';
 import APIAdapter from '../../services/api';
 import { PiseiroDataContext } from '../../hooks/PiseiroData';
+import { centimetersToMeters } from '../../utils/number';
 
 interface PositionData {
   [key: string]: {
@@ -160,7 +161,10 @@ export const Room: React.FC = () => {
     try {
       const params = {
         repetitions: roomRepetitions,
-        ceramic_data: { width: ceramicWidth, height: ceramicHeight },
+        ceramic_data: {
+          width: centimetersToMeters(ceramicWidth),
+          height: centimetersToMeters(ceramicHeight),
+        },
         cuts: positionData[selectedLayingStart].cuts.filter(
           (cut) => !notSelected[cut.id]
         ),

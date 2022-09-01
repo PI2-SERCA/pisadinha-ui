@@ -16,7 +16,7 @@ import useStyles from './cut-styles';
 import APIAdapter from '../../services/api';
 import { PiseiroDataContext } from '../../hooks/PiseiroData';
 import { applyValues } from '../../utils/canvas';
-import { getPolygonPoints } from '../../utils/number';
+import { centimetersToMeters, getPolygonPoints } from '../../utils/number';
 
 const steps = ['Medidas cerâmica', 'Medidas corte', 'Preview'];
 
@@ -166,8 +166,11 @@ export const Cut: React.FC = () => {
 
       const params = {
         repetitions: cutRepetitions,
-        ceramic_data: { width: ceramicWidth, height: ceramicHeight },
-        points: getPolygonPoints(cut.points, cutMeasures),
+        ceramic_data: {
+          width: centimetersToMeters(ceramicWidth),
+          height: centimetersToMeters(ceramicHeight),
+        },
+        points: getPolygonPoints(cut.points, cutMeasures, centimetersToMeters),
       };
 
       await apiAdapter.post('single-cut', params);

@@ -22,13 +22,17 @@ import {
   drawShape,
   getCanvasWidth,
   getCanvasHeight,
+  applyValues,
 } from '../../../../utils/canvas';
 
 import useStyles from './laying-start-styles';
 
 import { Cast, Cut } from '../../../../types';
 import APIAdapter from '../../../../services/api';
-import { getPolygonPoints } from '../../../../utils/number';
+import {
+  centimetersToMeters,
+  getPolygonPoints,
+} from '../../../../utils/number';
 
 interface LayingStartProps {
   room: Cast;
@@ -67,6 +71,9 @@ export const LayingStart: React.FC<LayingStartProps> = ({
   const [loading, setLoading] = useState(false);
   const [loadingPosition, setLoadingPosition] = useState(false);
   const [corners, setCorners] = useState<Record<string, string[]>>({});
+  const [cornersIndexes, setcornersIndexes] = useState<Record<string, number>>(
+    {}
+  );
 
   const fetchPositionData = async (
     key: string
@@ -84,11 +91,11 @@ export const LayingStart: React.FC<LayingStartProps> = ({
         await apiAdapter.get('floor-laying', {
           params: {
             points: JSON.stringify(points),
-            corner: 1,
+            corner: cornersIndexes[key],
             ceramic_data: JSON.stringify({
-              spacing,
-              width: ceramicWidth,
-              height: ceramicHeight,
+              spacing: centimetersToMeters(spacing),
+              width: centimetersToMeters(ceramicWidth),
+              height: centimetersToMeters(ceramicHeight),
             }),
           },
         });
@@ -134,18 +141,25 @@ export const LayingStart: React.FC<LayingStartProps> = ({
       });
 
       const newCorners: Record<string, string[]> = {};
+      const newCornersIndexes: Record<string, number> = {};
 
       const alphabet = Array.from(Array(26)).map((_, i) =>
         String.fromCharCode(i + 65)
       );
 
       response.corners.forEach((cornerIdx, idx) => {
-        const [x, y] = points[cornerIdx];
+        const point = room.points[cornerIdx];
+        // we should use the room default measures to draw properly in the canvas
+        const [x, y] = point
+          .split(';')
+          .map((key) => applyValues(room.defaults, key));
 
+        newCornersIndexes[alphabet[idx]] = cornerIdx;
         newCorners[alphabet[idx]] = [`${x};${y}`, `${x};${y}`];
       });
 
       setCorners(newCorners);
+      setcornersIndexes(newCornersIndexes);
     } catch {
       toast.error(
         'Não foi possível obter os pontos de início de assentamento.'
