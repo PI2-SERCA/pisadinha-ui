@@ -270,6 +270,11 @@ export const Room: React.FC = () => {
   );
 
   useEffect(() => {
+    setPositionData({});
+    setSelectedLayingStart('');
+  }, [roomMeasures, spacing, ceramicWidth, ceramicHeight]);
+
+  useEffect(() => {
     const idx = parseInt(roomIdx, 10);
 
     if (!roomIdx || Number.isNaN(idx) || (!Number.isNaN(idx) && !rooms[idx])) {
