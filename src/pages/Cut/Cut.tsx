@@ -20,7 +20,7 @@ import { centimetersToMeters, getPolygonPoints } from '../../utils/number';
 
 const steps = ['Medidas cerâmica', 'Medidas corte', 'Preview'];
 
-const MEASURE_PROPORTION = 10;
+const MEASURE_PROPORTION = 500;
 
 export const Cut: React.FC = () => {
   const classes = useStyles();
