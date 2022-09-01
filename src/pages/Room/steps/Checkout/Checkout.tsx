@@ -47,7 +47,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
         helperText={checkoutErrors.roomRepetitions}
         label="Quantidade de repetições do cômodo"
         InputLabelProps={{ shrink: true }}
-        style={{ minWidth: 300, margin: '16px 0' }}
+        style={{ minWidth: 300, height: 56, margin: '16px 0' }}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setRoomRepetitions(parseInt(e.target.value, 10))
         }

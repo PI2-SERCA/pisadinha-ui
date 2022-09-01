@@ -49,7 +49,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
           error={!!checkoutErrors.cutRepetitions}
           helperText={checkoutErrors.cutRepetitions}
           InputLabelProps={{ shrink: true }}
-          style={{ minWidth: 300 }}
+          style={{ minWidth: 300, height: 56 }}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setCutRepetitions(parseInt(e.target.value, 10))
           }
