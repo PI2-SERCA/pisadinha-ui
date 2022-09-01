@@ -109,7 +109,7 @@ export const Room: React.FC = () => {
 
     if (
       Object.values(notSelected).filter((i) => !!i).length ===
-      Object.keys(positionData[selectedLayingStart]).length
+      positionData[selectedLayingStart].cuts.length
     )
       newCheckoutErrors.general = 'Pelo menos um corte deve ser selecionado';
 
