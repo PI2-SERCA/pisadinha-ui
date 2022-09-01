@@ -73,6 +73,7 @@ export const Room: React.FC = () => {
   const validateCeramicMeasuresStep = useCallback(() => {
     return validateCeramicMeasures({
       spacing,
+      isLaying: true,
       ceramicDepth,
       ceramicWidth,
       ceramicHeight,
