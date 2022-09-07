@@ -165,6 +165,7 @@ export const Room: React.FC = () => {
         ceramic_data: {
           width: centimetersToMeters(ceramicWidth),
           height: centimetersToMeters(ceramicHeight),
+          depth: centimetersToMeters(ceramicDepth),
         },
         cuts: positionData[selectedLayingStart].cuts.filter(
           (cut) => !notSelected[cut.id]
@@ -186,6 +187,7 @@ export const Room: React.FC = () => {
     validateStep,
     roomRepetitions,
     ceramicWidth,
+    ceramicDepth,
     ceramicHeight,
     positionData,
     selectedLayingStart,

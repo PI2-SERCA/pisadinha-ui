@@ -169,6 +169,7 @@ export const Cut: React.FC = () => {
         ceramic_data: {
           width: centimetersToMeters(ceramicWidth),
           height: centimetersToMeters(ceramicHeight),
+          depth: centimetersToMeters(ceramicDepth),
         },
         points: getPolygonPoints(cut.points, cutMeasures, centimetersToMeters),
       };
@@ -186,6 +187,7 @@ export const Cut: React.FC = () => {
   }, [
     cut,
     history,
+    ceramicDepth,
     cutMeasures,
     ceramicWidth,
     ceramicHeight,
