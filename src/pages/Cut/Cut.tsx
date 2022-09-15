@@ -1,6 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { Step, Button, Stepper, StepLabel, Container } from '@material-ui/core';
 
+import { useHistory, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { Checkout } from './steps/Checkout';
 import {
   CeramicMeasures,
@@ -11,26 +13,25 @@ import { CastMeasures as CutMeasures } from '../../components/CastMeasures';
 import { Cast } from '../../types';
 
 import useStyles from './cut-styles';
+import APIAdapter from '../../services/api';
+import { PiseiroDataContext } from '../../hooks/PiseiroData';
+import { applyValues } from '../../utils/canvas';
+import { centimetersToMeters, getPolygonPoints } from '../../utils/number';
 
 const steps = ['Medidas cerâmica', 'Medidas corte', 'Preview'];
 
-const requestResponse: Cast = {
-  points: ['0;0', 'a;0', 'a;a', '0;a', '0;0'],
-  defaults: {
-    a: 20,
-  },
-  segments: {
-    a: ['0;0', 'a;0'],
-  },
-  name: 'Corte Quadrado',
-};
-
-const MEASURE_PROPORTION = 10;
+const MEASURE_PROPORTION = 500;
 
 export const Cut: React.FC = () => {
   const classes = useStyles();
+  const history = useHistory();
+
+  const { cutIdx } = useParams<{ cutIdx: string }>();
+
+  const { cuts } = useContext(PiseiroDataContext);
 
   const [activeStep, setActiveStep] = useState(0);
+  const [cut, setCut] = useState<Cast>({} as Cast);
   const [cutRepetitions, setCutRepetitions] = useState(1);
   const [spacing, setSpacing] = useState<number | null>(null);
   const [ceramicDepth, setCeramicDepth] = useState<number | null>(null);
@@ -45,12 +46,12 @@ export const Cut: React.FC = () => {
     {}
   );
 
-  const cutMaxMeasure = () => {
-    const values = Object.values(requestResponse.defaults);
+  const cutMaxMeasure = useCallback(() => {
+    const values = Object.values(cut.defaults);
 
     // + 50 is the offset
     return values.sort()[values.length - 1] * MEASURE_PROPORTION + 50;
-  };
+  }, [cut]);
 
   const validateCeramicMeasuresStep = useCallback(() => {
     return validateCeramicMeasures({
@@ -62,19 +63,62 @@ export const Cut: React.FC = () => {
     });
   }, [spacing, ceramicDepth, ceramicWidth, ceramicHeight, setFieldsErrors]);
 
-  const validateCutMeasuresStep = useCallback(() => {
-    const newFieldsErrors: Record<string, string> = {};
+  const keyErrorMessage = (key: string, message: string) =>
+    `"${key.toUpperCase()}" ${message}`;
 
-    Object.keys(requestResponse.segments).forEach((key) => {
+  const validateAxisValues = useCallback(
+    (points: string[]) => {
+      const errors: Record<string, string> = {};
+
+      if (!ceramicWidth || !ceramicHeight) return {};
+
+      points.forEach((point) => {
+        const [xKey, yKey] = point.split(';');
+        const xValue = applyValues(cutMeasures, xKey);
+        const yValue = applyValues(cutMeasures, yKey);
+
+        if (xValue > ceramicWidth) {
+          errors[xKey] = keyErrorMessage(
+            xKey,
+            'não pode ser maior as dimensões da cerâmica'
+          );
+        }
+
+        if (yValue > ceramicHeight) {
+          errors[yKey] = keyErrorMessage(
+            yKey,
+            'não pode ser maior as dimensões da cerâmica'
+          );
+        }
+      });
+
+      return errors;
+    },
+    [cutMeasures, ceramicWidth, ceramicHeight]
+  );
+
+  const validateCutMeasuresStep = useCallback(() => {
+    let missingValue = false;
+    let newFieldsErrors: Record<string, string> = {};
+
+    Object.keys(cut.segments).forEach((key) => {
       if (!cutMeasures[key]) {
-        newFieldsErrors[key] = `${key.toUpperCase()} é obrigatório`;
+        missingValue = true;
+        newFieldsErrors[key] = keyErrorMessage(key, 'é obrigatório');
       }
     });
+
+    if (!missingValue) {
+      newFieldsErrors = {
+        ...newFieldsErrors,
+        ...validateAxisValues(cut.points),
+      };
+    }
 
     setCutMeasuresErrors(newFieldsErrors);
 
     return Object.keys(newFieldsErrors).length === 0;
-  }, [cutMeasures, setCutMeasuresErrors]);
+  }, [cut, cutMeasures, setCutMeasuresErrors, validateAxisValues]);
 
   const validateCheckoutStep = useCallback(() => {
     const newCheckoutErrors: Record<string, string> = {};
@@ -114,9 +158,42 @@ export const Cut: React.FC = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   }, []);
 
-  const handleSubmit = useCallback(() => {
-    validateStep();
-  }, [validateStep]);
+  const handleSubmit = useCallback(async () => {
+    if (!validateStep()) return;
+
+    try {
+      const apiAdapter = new APIAdapter();
+
+      const params = {
+        repetitions: cutRepetitions,
+        ceramic_data: {
+          width: centimetersToMeters(ceramicWidth),
+          height: centimetersToMeters(ceramicHeight),
+          depth: centimetersToMeters(ceramicDepth),
+        },
+        points: getPolygonPoints(cut.points, cutMeasures, centimetersToMeters),
+      };
+
+      await apiAdapter.post('single-cut', params);
+
+      toast.success('Corte enviado com sucesso!');
+
+      history.push('/');
+    } catch (error) {
+      toast.error(
+        'Não foi possível enviar o corte. Por favor tente novamente.'
+      );
+    }
+  }, [
+    cut,
+    history,
+    ceramicDepth,
+    cutMeasures,
+    ceramicWidth,
+    ceramicHeight,
+    cutRepetitions,
+    validateStep,
+  ]);
 
   const getStepContent = useCallback(
     (step: number): JSX.Element => {
@@ -139,9 +216,9 @@ export const Cut: React.FC = () => {
           return (
             <CutMeasures
               measure="cm"
+              cast={cut}
               proportion={MEASURE_PROPORTION}
               maxCanvasHeight={cutMaxMeasure()}
-              requestResponse={requestResponse}
               castMeasuresErrors={cutMeasuresErrors}
               castMeasures={cutMeasures}
               setCastMeasures={setCutMeasures}
@@ -150,10 +227,11 @@ export const Cut: React.FC = () => {
         case 2:
           return (
             <Checkout
+              cut={cut}
+              cutMeasures={cutMeasures}
               checkoutErrors={checkoutErrors}
               cutRepetitions={cutRepetitions}
               setCutRepetitions={setCutRepetitions}
-              requestResponse={requestResponse}
               ceramicWidth={ceramicWidth as number}
               ceramicHeight={ceramicHeight as number}
             />
@@ -163,7 +241,9 @@ export const Cut: React.FC = () => {
       }
     },
     [
+      cut,
       spacing,
+      cutMaxMeasure,
       ceramicDepth,
       ceramicWidth,
       ceramicHeight,
@@ -175,6 +255,16 @@ export const Cut: React.FC = () => {
       cutMeasuresErrors,
     ]
   );
+
+  useEffect(() => {
+    const idx = parseInt(cutIdx, 10);
+
+    if (!cutIdx || Number.isNaN(idx) || (!Number.isNaN(idx) && !cuts[idx])) {
+      history.push('/');
+    } else {
+      setCut(cuts[parseInt(cutIdx, 10)]);
+    }
+  }, [cuts, cutIdx, history]);
 
   return (
     <Container className={classes.container}>

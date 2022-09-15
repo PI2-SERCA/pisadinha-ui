@@ -21,9 +21,9 @@ import useStyles from './cast-measures-styles';
 import { Cast } from '../../types';
 
 interface CastMeasuresProps {
+  cast: Cast;
   measure: 'cm' | 'm';
   proportion?: number;
-  requestResponse: Cast;
   maxCanvasHeight?: number;
   castMeasures: Record<string, number>;
   castMeasuresErrors: Record<string, string>;
@@ -31,12 +31,12 @@ interface CastMeasuresProps {
 }
 
 export const CastMeasures: React.FC<CastMeasuresProps> = ({
+  cast,
   measure,
   proportion,
   castMeasures,
   maxCanvasHeight,
   setCastMeasures,
-  requestResponse,
   castMeasuresErrors,
 }) => {
   const classes = useStyles();
@@ -49,22 +49,18 @@ export const CastMeasures: React.FC<CastMeasuresProps> = ({
             stroke="black"
             strokeWidth={LINE_WIDTH}
             sceneFunc={(context: Konva.Context, shape: Konva.Shape) =>
-              drawShape(context, shape, requestResponse, proportion)
+              drawShape(context, shape, cast, proportion)
             }
           />
 
-          {drawTexts(
-            requestResponse.segments,
-            requestResponse.defaults,
-            proportion
-          )}
+          {drawTexts(cast.segments, cast.defaults, proportion)}
         </Layer>
       </Stage>
 
       <Typography variant="body1">Insira as medidas correspondentes</Typography>
 
       <Box className={classes.inputBox}>
-        {Object.keys(requestResponse.segments).map((key) => (
+        {Object.keys(cast.segments).map((key) => (
           <TextField
             key={key}
             required

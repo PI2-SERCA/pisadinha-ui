@@ -1,10 +1,14 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Typography from '@material-ui/core/Typography';
+
+import {
+  Card,
+  CardMedia,
+  Typography,
+  CardContent,
+  CardActionArea,
+} from '@material-ui/core';
+import { base64ToUrl } from '../../utils/image';
 
 const useStyles = makeStyles({
   root: {
@@ -12,22 +16,27 @@ const useStyles = makeStyles({
   },
 });
 
-export const ItemCard: React.FC<{ type: 'room' | 'cut' }> = ({ type }) => {
+interface ItemCardProps {
+  name: string;
+  base64: string;
+}
+
+export const ItemCard: React.FC<ItemCardProps> = ({ name, base64 }) => {
   const classes = useStyles();
 
   return (
     <Card className={classes.root}>
       <CardActionArea>
         <CardMedia
-          component="img"
-          alt="Contemplative Reptile"
+          alt={name}
+          title={name}
           height="140"
-          image="https://image.shutterstock.com/image-vector/house-plan-simple-flat-icon-600w-589995872.jpg"
-          title="Contemplative Reptile"
+          component="img"
+          image={base64ToUrl(base64)}
         />
         <CardContent>
           <Typography gutterBottom variant="h6" component="h2">
-            {type === 'room' ? 'Cômodo' : 'Corte'} XPTO
+            {name}
           </Typography>
         </CardContent>
       </CardActionArea>
